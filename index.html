@@ -1,0 +1,1744 @@
+<!DOCTYPE html>
+<!-- claim-ok: EGYM in Hoogeveen vind je alleen bij ConnectFit | bron: claimregister, gebruiker 2026-09-02 (enige EGYM-aanbieder in Hoogeveen) -->
+<!--
+  ConnectFit EGYM kennismaking Hoogeveen. Nagebouwd op de opbouw van fit20start.nl/haarlem-ramplaankwartier (2026-09-24).
+  Mechaniek: pijn -> oplossing -> check (doel, drempel, locatie) -> gegevens -> persoonlijke uitslag -> hoofdcoach belt.
+
+  Voor livegang invullen:
+  1. LEAD_ENDPOINT hieronder (Zapier-webhook of /api/lead). Leeg = lead gaat nergens heen, alleen console.
+  2. /assets/js/tracking.js (created/tracking/connectfit-tracking.js) laden boven GTM. De pagina roept CF.* aan als die er is.
+  3. Afbeeldingen staan relatief in assets/. Twee foto's zijn gemaakt in Ruinen, dat staat eerlijk in het bijschrift.
+-->
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ConnectFit Hoogeveen | Train heel je lichaam in 30 minuten</title>
+<meta name="description" content="EGYM in Hoogeveen: toestellen die zich op jou instellen, acht oefeningen voor je belangrijkste spiergroepen, klaar in ongeveer 30 minuten. Begin met een gratis kennismaking.">
+<meta name="robots" content="noindex, follow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- <script src="/assets/js/tracking.js"></script>  + GTM-snippet -->
+<style>
+:root{
+  --rood:#e8192c;
+  --rood-diep:#c21222;
+  --rood-zacht:#fdf0f1;
+  --vink:#1f9d55;
+  --vink-zacht:#eaf6ef;
+  --inkt:#0e0e0e;
+  --grijs:#3d3d3d;
+  --grijs-licht:#5c5c5c;
+  --papier:#FFFFFF;
+  --papier-2:#f4f2ee;
+  --papier-3:#fafaf8;
+  --lijn:#e6e3de;
+  --donker:#0e0e0e;
+  --alarm:#a3261a;
+  --r:14px;
+  --wrap:1140px;
+  --schaduw:0 1px 2px rgba(14,14,14,.05), 0 10px 30px rgba(14,14,14,.08);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--papier);color:var(--grijs);
+  font-family:"Montserrat",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:18px;line-height:1.65;-webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;height:auto;display:block}
+h1,h2,h3{font-family:"Montserrat",sans-serif;font-weight:700;line-height:1.14;letter-spacing:-.015em;color:var(--inkt);margin:0 0 .5em}
+h1{font-size:clamp(2.15rem,5.4vw,3.7rem)}
+h2{font-size:clamp(1.7rem,3.6vw,2.6rem)}
+h3{font-size:1.18rem}
+p{margin:0 0 1em}
+a{color:var(--inkt)}
+strong,b{color:var(--inkt)}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 22px}
+.sec{padding:76px 0}
+.sec--alt{background:var(--papier-2)}
+.sec--donker{background:var(--donker);color:#cfcbc4}
+.sec--donker h2,.sec--donker h3{color:#fff}
+.sec--donker strong,.sec--donker b{color:#fff}
+.eyebrow{font-family:"Montserrat",sans-serif;font-weight:700;font-size:1rem;color:var(--grijs);margin:0 0 10px}
+.sec--donker .eyebrow{color:var(--rood)}
+.lead{font-size:1.16rem;max-width:62ch}
+.sec--donker .lead{color:#b3aea6}
+.mid{text-align:center}
+.mid .lead{margin-left:auto;margin-right:auto}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  border:0;cursor:pointer;text-decoration:none;text-align:center;
+  font-family:"Montserrat",sans-serif;font-weight:700;font-size:1.08rem;
+  padding:17px 34px;border-radius:999px;
+  background:var(--rood);color:#fff;
+  transition:transform .12s ease, background .15s ease, box-shadow .15s ease;
+  box-shadow:0 4px 14px rgba(232,25,44,.32);
+}
+.btn:hover{background:var(--rood-diep);transform:translateY(-1px);box-shadow:0 6px 18px rgba(232,25,44,.38)}
+.btn:active{transform:translateY(0)}
+.btn:focus-visible{outline:3px solid var(--inkt);outline-offset:3px}
+.btn--groot{font-size:1.2rem;padding:21px 44px}
+.btn--licht{background:#fff;color:var(--inkt);box-shadow:inset 0 0 0 1.5px var(--lijn)}
+.btn--licht:hover{background:var(--papier-2);box-shadow:inset 0 0 0 1.5px var(--lijn)}
+.btn[disabled]{opacity:.45;cursor:default;transform:none;box-shadow:none}
+@media(max-width:600px){
+  main .btn{width:100%}
+  .btn--groot{font-size:1.1rem;padding:19px 28px}
+
+  main .btn + .microcopy{text-align:center}
+}
+.microcopy{font-size:1rem;color:var(--grijs-licht);margin:13px 0 0}
+
+.cookie{position:fixed;left:0;right:0;bottom:0;z-index:70;background:var(--papier);
+  border-top:2px solid var(--lijn);box-shadow:0 -8px 30px rgba(14,14,14,.12);
+  padding:18px 22px calc(18px + env(safe-area-inset-bottom));
+  transform:translateY(110%);transition:transform .28s ease}
+.cookie.aan{transform:none}
+.cookie__in{max-width:var(--wrap);margin:0 auto;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between}
+.cookie p{margin:0;font-size:1rem;max-width:62ch}
+.cookie__knoppen{display:flex;gap:10px;flex-wrap:wrap}
+.cookie .btn{padding:13px 24px;font-size:1rem;box-shadow:none}
+@media(max-width:700px){
+  .cookie__in{flex-direction:column;align-items:stretch}
+  .cookie__knoppen{flex-direction:column}
+  .cookie .btn{width:100%}
+  body.cookie-open .sticky{bottom:auto;display:none}
+}
+
+.knoppen{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;align-items:center}
+.knoppen--links{justify-content:flex-start}
+.sec--donker .btn--licht{background:transparent;color:#fff;box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.45)}
+.sec--donker .btn--licht:hover{background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.75)}
+@media(max-width:600px){.knoppen{flex-direction:column;gap:12px}.knoppen .btn{width:100%}}
+
+.video{font:inherit;position:relative;aspect-ratio:16/9;max-width:100%;border-radius:16px;overflow:hidden;background:#0e0e0e;border:0;padding:0;display:block;width:100%;cursor:pointer}
+.video img{width:100%;height:100%;object-fit:cover;display:block}
+.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.video__knop{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.video__knop i{width:82px;height:82px;border-radius:50%;background:var(--rood);display:flex;align-items:center;justify-content:center}
+.video__knop i::after{content:"";border-left:26px solid #fff;border-top:16px solid transparent;border-bottom:16px solid transparent;margin-left:7px}
+.video__label{position:absolute;left:0;right:0;bottom:0;background:rgba(14,14,14,.88);color:#fff;text-align:left;padding:14px 18px;font-weight:600}
+
+.verg__rol{position:relative;margin-top:28px}
+.verg__bollen{display:none}
+@media(max-width:839px){
+  .verg__bollen{display:flex;justify-content:center;gap:10px;margin:16px 0 0}
+  .verg__bollen button{width:12px;height:12px;padding:0;border-radius:50%;border:0;
+    background:#cfcbc4;cursor:pointer;transition:background .2s,transform .2s}
+  .verg__bollen button[aria-current="true"]{background:var(--rood-diep);transform:scale(1.35)}
+}
+.verg{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;
+  scroll-snap-type:x proximity;border:1px solid var(--lijn);border-radius:16px;background:var(--papier)}
+.verg__raster{display:grid;grid-template-columns:132px repeat(3,minmax(142px,1fr));min-width:max-content}
+.verg__cel{padding:14px 16px;border-bottom:1px solid var(--lijn);display:flex;align-items:center;min-height:62px}
+.verg__raster > .verg__cel:nth-last-child(-n+4){border-bottom:0}
+.verg__wat{position:sticky;left:0;z-index:2;background:var(--papier);border-right:1px solid var(--lijn);
+  font-family:"Montserrat",sans-serif;font-weight:700;color:var(--inkt);line-height:1.25}
+.verg__kop{background:var(--papier-2);font-family:"Montserrat",sans-serif;font-weight:700;color:var(--inkt);
+  scroll-snap-align:start;position:sticky;top:0}
+.verg__kop.verg__wat{z-index:3}
+.verg__wij{background:var(--rood-zacht);scroll-snap-align:start}
+.verg__kop.verg__wij{background:var(--inkt);color:var(--inkt)}
+.verg__wij b{color:var(--inkt)}
+.verg__schaduw{position:absolute;top:0;bottom:0;right:0;width:54px;pointer-events:none;opacity:1;
+  transition:opacity .25s;background:linear-gradient(to left,rgba(255,255,255,1) 12%,rgba(255,255,255,0));border-radius:0 16px 16px 0}
+.verg__rol.aan-het-eind .verg__schaduw{opacity:0}
+@media(min-width:840px){
+
+  .verg__schaduw{display:none}
+
+  .verg{overflow:hidden}
+
+  .verg__rol{max-width:1000px}
+
+  .verg__raster{grid-template-columns:1.5fr 1.25fr 1fr 1fr;min-width:0}
+}
+.hero__antwoord{font-size:1.18rem;line-height:1.5;color:var(--inkt);border-left:4px solid var(--rood);padding-left:18px;margin:0 0 22px}
+@media(max-width:640px){.hero__antwoord{font-size:1.08rem;padding-left:14px}}
+.sec--donker .microcopy{color:#8f8a82}
+
+.kop__bewijs{color:var(--grijs);white-space:nowrap}
+.kop__bewijs b{color:var(--inkt)}
+.kop__bewijs .ster{color:#e0a100;letter-spacing:1px}
+
+@media(max-width:900px){.kop__bewijs{font-size:1rem;white-space:normal;text-align:right;line-height:1.25}}
+
+.kop .btn{white-space:nowrap;flex:0 0 auto}
+.kop__bewijs{flex:0 1 auto;min-width:0}
+@media(max-width:1099px){.kop__bewijs .lang{display:none}}
+
+.kop{background:var(--papier);border-bottom:1px solid var(--lijn);position:sticky;top:0;z-index:40}
+.kop .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;height:72px}
+.kop .merk{display:flex;align-items:center;gap:14px;text-decoration:none}
+.kop img{height:32px;width:auto}
+.kop .plaats{font-family:"Montserrat",sans-serif;font-weight:600;font-size:1rem;color:var(--grijs);padding-left:14px;border-left:1px solid var(--lijn);white-space:nowrap}
+
+@media(max-width:520px){.plaats{font-size:.92rem;padding-left:10px}}
+@media(max-width:400px){.plaats{font-size:.86rem;padding-left:8px}}
+.kop .btn{padding:11px 24px;font-size:1rem;box-shadow:none}
+@media(max-width:760px){.kop .btn{display:none}.kop{position:static}.kop .plaats{font-size:1rem}}
+
+.hero{padding:44px 0 66px;background:linear-gradient(168deg,#fff 0%,var(--papier-2) 100%)}
+
+.hero__grid{
+  display:grid;grid-template-columns:1.04fr .96fr;grid-template-rows:auto 1fr;
+  grid-template-areas:"kop foto" "rest foto";
+  column-gap:54px;align-items:start;
+}
+.hero__kop{grid-area:kop}
+.hero__rest{grid-area:rest}
+.hero__foto{grid-area:foto;align-self:center}
+@media(max-width:920px){
+  .hero{padding:32px 0 46px}
+  .hero__grid{grid-template-columns:1fr;grid-template-rows:none;grid-template-areas:"kop" "foto" "rest";row-gap:26px}
+}
+.hero h1{margin-bottom:.4em}
+.hero .hero__onder{font-size:1.08rem;line-height:1.55;color:var(--inkt);max-width:52ch;margin:0 0 22px}
+.hero .eyebrow{color:var(--inkt);margin-bottom:8px}
+
+.uitstap{position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .2s ease}
+.uitstap.aan{opacity:1}
+.uitstap__doek{position:absolute;inset:0;background:rgba(14,14,14,.7)}
+.uitstap__kaart{position:relative;background:var(--papier);border-radius:22px;box-shadow:0 24px 70px rgba(0,0,0,.3);
+  padding:38px 34px 30px;max-width:470px;width:100%;max-height:92vh;overflow-y:auto;
+  transform:translateY(14px);transition:transform .24s cubic-bezier(.2,.8,.3,1)}
+.uitstap.aan .uitstap__kaart{transform:none}
+.uitstap__kaart h2{font-size:1.6rem;margin:0 0 12px;max-width:20ch}
+.uitstap__kaart p{margin:0 0 22px;color:var(--grijs)}
+.uitstap__x{position:absolute;top:12px;right:14px;width:38px;height:38px;border:0;background:transparent;
+  font-size:1.7rem;line-height:1;color:var(--grijs-licht);cursor:pointer;border-radius:50%}
+.uitstap__x:hover{background:var(--papier-2);color:var(--inkt)}
+.uitstap__form .veld{margin-bottom:13px}
+.uitstap__form .btn{width:100%;margin-top:6px}
+.uitstap__fout{margin:0 0 8px;color:var(--magenta);font-size:1rem;min-height:0;display:none}
+.uitstap__fout.aan{display:block}
+.uitstap__klein{font-size:1rem;color:var(--grijs-licht);margin:14px 0 0;text-align:center}
+.uitstap__anders{display:block;width:100%;margin-top:16px;padding:11px;border:0;background:transparent;
+  color:var(--inkt);font-family:inherit;font-size:1rem;font-weight:600;cursor:pointer;text-decoration:underline}
+.honing{position:absolute;left:-9999px;width:1px;height:1px;opacity:0}
+body.uitstap-open{overflow:hidden}
+@media(max-width:600px){
+  .uitstap{align-items:flex-end;padding:0}
+  .uitstap__kaart{border-radius:22px 22px 0 0;padding:32px 22px 26px;max-height:88vh}
+}
+
+.plekken{max-width:430px}
+.mid .plekken{margin-left:auto;margin-right:auto}
+.plekken__kop{display:flex;justify-content:space-between;align-items:baseline;gap:16px;font-size:1rem;color:var(--grijs);margin-bottom:9px}
+.plekken__kop b{color:var(--inkt);font-weight:600;white-space:nowrap}
+.plekken__balk{height:10px;border-radius:999px;background:#e6e3de;overflow:hidden}
+.plekken__balk span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--rood) 0%,var(--rood-diep) 100%)}
+.sec--donker .plekken__kop{color:#b3aea6}
+.sec--donker .plekken__kop b{color:#fff}
+.sec--donker .plekken__balk{background:rgba(255,255,255,.18)}
+.hero .plekken{margin:4px 0 0}
+@media(min-width:921px){.hero__rest{padding-top:26px}}
+.hero h1 span{color:var(--inkt)}
+.hero__foto{position:relative;border-radius:22px;overflow:hidden;box-shadow:var(--schaduw)}
+.hero__foto img{width:100%;aspect-ratio:4/5;object-fit:cover;object-position:center 32%}
+@media(max-width:920px){.hero__foto img{aspect-ratio:16/10}}
+.hero__kaart{
+  position:absolute;left:16px;right:16px;bottom:16px;
+  background:var(--papier);
+  border-radius:12px;padding:14px 18px;font-size:1rem;line-height:1.45;color:var(--grijs);
+}
+.hero__kaart b{display:block;font-family:"Montserrat",sans-serif;font-size:1rem;margin-bottom:1px}
+
+@media(max-width:920px){
+  .hero__foto{border-radius:18px}
+  .hero__kaart{
+    position:static;margin:0;border-radius:0;background:var(--rood-zacht);
+    backdrop-filter:none;padding:13px 16px;border-top:1px solid var(--rood);
+  }
+}
+.checks{list-style:none;margin:28px 0 0;padding:0;display:grid;gap:13px}
+.checks li{position:relative;padding-left:38px;font-size:1.06rem}
+.checks li::before{content:"";position:absolute;left:0;top:2px;width:25px;height:25px;border-radius:50%;background:var(--rood-zacht);border:1.5px solid var(--rood)}
+.checks li::after{content:"";position:absolute;left:9px;top:9px;width:6px;height:11px;border:solid var(--rood-diep);border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+
+.rijen{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:42px}
+.rij{background:var(--papier);border:1px solid var(--lijn);border-radius:var(--r);padding:28px}
+.rij .zegt{font-family:"Montserrat",sans-serif;font-weight:700;font-size:1.16rem;color:var(--inkt);margin:0 0 10px;line-height:1.34}
+.rij p:last-child{margin:0;font-size:1.02rem}
+.rijen__bollen{display:none}
+@media(max-width:840px){
+  .rijen{display:flex;gap:14px;margin:34px -22px 0;padding:0 22px 6px;
+    overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;
+    scrollbar-width:none}
+  .rijen::-webkit-scrollbar{display:none}
+  .rij{flex:0 0 82%;scroll-snap-align:center;padding:24px}
+  .rijen__bollen{display:flex;justify-content:center;gap:10px;margin:18px 0 0}
+  .rijen__bollen button{width:12px;height:12px;padding:0;border-radius:50%;border:0;
+    background:#cfcbc4;cursor:pointer;transition:background .2s,transform .2s}
+  .rijen__bollen button[aria-current="true"]{background:var(--rood-diep);transform:scale(1.35)}
+}
+@media(min-width:841px){}
+
+.stappen{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:46px;counter-reset:s}
+
+@media(max-width:820px){
+  .stappen{display:flex;grid-template-columns:none;gap:14px;margin:38px -22px 0;padding:0 22px 6px;
+    overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;scrollbar-width:none}
+  .stappen::-webkit-scrollbar{display:none}
+  .stap{flex:0 0 82%;scroll-snap-align:center;padding:26px 24px}
+}
+.stappen__bollen{display:none}
+@media(max-width:820px){
+  .stappen__bollen{display:flex;justify-content:center;gap:10px;margin:18px 0 0}
+  .stappen__bollen button{width:12px;height:12px;padding:0;border-radius:50%;border:0;
+    background:rgba(255,255,255,.3);cursor:pointer;transition:background .2s,transform .2s}
+  .stappen__bollen button[aria-current="true"]{background:var(--rood);transform:scale(1.35)}
+}
+.stap{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:var(--r);padding:30px 28px}
+.stap::before{
+  counter-increment:s;content:counter(s);
+  display:flex;align-items:center;justify-content:center;width:42px;height:42px;
+  border-radius:50%;background:var(--rood);color:#fff;
+  font-family:"Montserrat",sans-serif;font-weight:700;font-size:1.15rem;margin-bottom:18px;
+}
+.stap p:last-child{margin:0;font-size:1.01rem}
+
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:56px;align-items:center}
+.duo--boven{align-items:start}
+@media(max-width:920px){.duo{grid-template-columns:1fr;gap:32px}}
+.duo img{border-radius:20px;box-shadow:var(--schaduw)}
+
+.feitjes{list-style:none;margin:46px 0 0;padding:0;display:grid;gap:1px;
+  grid-template-columns:repeat(3,1fr);background:var(--lijn);border:1px solid var(--lijn);border-radius:16px;overflow:hidden}
+.feitjes li{display:flex;flex-direction:column;gap:4px;padding:18px 20px;background:var(--papier);font-size:1.02rem}
+.feitjes span{color:var(--grijs-licht);font-size:.97rem}
+.feitjes b{font-family:"Montserrat",sans-serif;color:var(--inkt);font-size:1.12rem;line-height:1.25}
+@media(max-width:860px){.feitjes{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.feitjes{grid-template-columns:1fr}.feitjes li{flex-direction:row;justify-content:space-between;align-items:baseline;gap:18px}.feitjes b{text-align:right;font-size:1.02rem}}
+.sec--donker .feitjes{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.16)}
+.sec--donker .feitjes li{background:var(--donker)}
+.sec--donker .feitjes span{color:#b3aea6}
+.sec--donker .feitjes{border-color:rgba(255,255,255,.16)}
+.sec--donker .feitjes li{border-color:rgba(255,255,255,.16)}
+
+.onderzoek{background:var(--papier-2);border-left:4px solid var(--inkt);border-radius:0 var(--r) var(--r) 0;padding:26px 30px;margin-top:32px}
+.onderzoek .cijfer{font-family:"Montserrat",sans-serif;font-weight:700;font-size:2.6rem;line-height:1;color:var(--inkt);margin-bottom:6px}
+.onderzoek p:last-child{margin:0;font-size:1rem}
+
+.quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:42px}
+.quotes--1{grid-template-columns:minmax(0,460px);justify-content:center}
+
+.studios{list-style:none;margin:26px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,1fr);gap:1px;
+  background:var(--lijn);border:1px solid var(--lijn);border-radius:var(--r);overflow:hidden}
+.studios li{background:var(--papier);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0}
+.studios li a:first-child{flex:1;display:block;padding:16px 18px;text-decoration:none;color:var(--inkt)}
+.studios li a:first-child:hover{background:#f4f2ee}
+.studios li b{display:block;font-family:"Montserrat",sans-serif;font-size:1.03rem}
+.studios li span{display:block;font-size:.94rem;color:var(--grijs-licht);margin-top:2px}
+
+.studios li a.studios__tel{padding:16px 18px;white-space:nowrap;font-size:.94rem;color:var(--inkt);text-decoration:none;display:block}
+
+@media(max-width:700px){
+  .studios{grid-template-columns:1fr}
+  .studios li{flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:0}
+  .studios li a:first-child{width:100%;padding:16px 18px 6px}
+  .studios li a.studios__tel{padding:0 18px 16px}
+}
+
+.quiz__link{background:none;border:0;padding:0;font:inherit;color:var(--inkt);text-decoration:underline;cursor:pointer}
+.quotes--2{grid-template-columns:repeat(2,minmax(0,420px));justify-content:center}
+
+@media(max-width:920px){
+  .quotes{display:flex;grid-template-columns:none;gap:14px;margin:34px -22px 0;padding:0 22px 6px;
+    overflow-x:auto;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;scrollbar-width:none}
+  .quotes::-webkit-scrollbar{display:none}
+  .quote-kaart{flex:0 0 82%;scroll-snap-align:center;padding:24px}
+}
+.quotes__bollen{display:none}
+@media(max-width:920px){
+  .quotes__bollen{display:flex;justify-content:center;gap:10px;margin:18px 0 0}
+  .quotes__bollen button{width:12px;height:12px;padding:0;border-radius:50%;border:0;
+    background:#cfcbc4;cursor:pointer;transition:background .2s,transform .2s}
+  .quotes__bollen button[aria-current="true"]{background:var(--rood-diep);transform:scale(1.35)}
+}
+.quote-kaart{background:var(--papier);border:1px solid var(--lijn);border-radius:var(--r);padding:28px;display:flex;flex-direction:column}
+.quotes + .microcopy a{display:inline-block;padding:11px 2px}
+.quote-kaart .sterren{color:#e0a100;letter-spacing:2px;margin-bottom:12px}
+.quote-kaart blockquote{margin:0 0 12px;font-family:"Montserrat",sans-serif;font-weight:700;font-size:1.14rem;line-height:1.36;color:var(--inkt)}
+.quote-kaart p{font-size:1rem;margin:0 0 16px}
+.quote-kaart .wie{margin-top:auto;font-size:1rem;color:var(--grijs-licht);font-weight:600}
+
+.trainer{display:grid;grid-template-columns:300px 1fr;gap:40px;align-items:center;background:var(--papier);border:1px solid var(--lijn);border-radius:20px;padding:36px;margin-top:42px}
+@media(max-width:760px){.trainer{grid-template-columns:1fr;padding:26px}}
+.trainer img{border-radius:16px;width:100%;aspect-ratio:1/1;object-fit:cover}
+
+.trainer img.scene{aspect-ratio:3/2}
+.scene-fig{margin:0}
+.scene-fig figcaption{margin-top:10px;font-size:1rem;line-height:1.45;color:var(--grijs-licht)}
+.trainer:has(img.scene){grid-template-columns:1fr 1fr;align-items:start}
+@media(max-width:760px){.trainer:has(img.scene){grid-template-columns:1fr}}
+.trainer .plek{
+  border-radius:16px;aspect-ratio:1/1;background:var(--papier-2);
+  border:1.5px dashed var(--inkt);display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:22px;font-size:1rem;color:var(--inkt);
+}
+
+.faq{margin-top:42px;border-top:1px solid var(--lijn)}
+.faq details{border-bottom:1px solid var(--lijn)}
+.faq summary{
+  cursor:pointer;list-style:none;padding:21px 46px 21px 0;position:relative;
+  font-family:"Montserrat",sans-serif;font-weight:700;font-size:1.1rem;color:var(--inkt);
+}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{
+  content:"";position:absolute;right:8px;top:50%;width:11px;height:11px;
+  border:solid var(--inkt);border-width:0 2.5px 2.5px 0;
+  transform:translateY(-70%) rotate(45deg);transition:transform .18s ease;
+}
+.faq details[open] summary::after{transform:translateY(-25%) rotate(225deg)}
+.faq .antwoord{padding:0 0 24px;font-size:1.03rem;max-width:70ch}
+.faq .antwoord p:last-child{margin:0}
+
+.praktisch{display:grid;grid-template-columns:1fr 1fr;gap:46px;align-items:start}
+@media(max-width:820px){.praktisch{grid-template-columns:1fr;gap:30px}}
+.kaartje{border-radius:18px;overflow:hidden;border:1px solid var(--lijn);background:var(--papier)}
+.kaartje iframe{border:0;width:100%;height:320px;display:block;filter:grayscale(.2)}
+
+.capaciteit{display:inline-flex;align-items:center;gap:11px;background:var(--rood-zacht);border:1px solid var(--rood);color:#e0a100;border-radius:999px;padding:10px 20px;font-size:1rem;font-weight:600}
+.capaciteit .stip{width:9px;height:9px;border-radius:50%;background:var(--rood-diep);flex:none;box-shadow:0 0 0 4px rgba(232,25,44,.25)}
+.sec--donker .capaciteit{background:rgba(232,25,44,.13);color:#f7c9cd;border-color:rgba(232,25,44,.5)}
+
+.sticky{
+  position:fixed;left:0;right:0;bottom:0;z-index:60;display:none;
+  background:var(--papier);
+  border-top:1px solid var(--lijn);padding:11px 16px calc(11px + env(safe-area-inset-bottom));
+  transform:translateY(0);opacity:1;
+  transition:transform .22s ease,opacity .18s ease;
+}
+
+.sticky[data-weg="ja"]{transform:translateY(105%);opacity:0;pointer-events:none}
+@media(prefers-reduced-motion:reduce){.sticky{transition:none}}
+.sticky .btn{width:100%}
+@media(max-width:900px){.sticky{display:block}}
+
+a[href^="tel:"],a[href^="mailto:"]{display:inline-block;padding:11px 2px}
+.voet{background:var(--donker);color:#8f8a82;font-size:1rem;padding:34px 0}
+.voet .wrap{display:flex;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.voet a{color:#cfcbc4}
+
+@media(max-width:900px){.voet{padding-bottom:122px}}
+
+.quiz{position:fixed;inset:0;z-index:100;background:var(--papier);display:none;flex-direction:column;overflow-y:auto;overscroll-behavior:contain}
+.quiz.aan{display:flex}
+.quiz__balk{position:sticky;top:0;background:var(--papier);border-bottom:2px solid var(--lijn);z-index:2}
+.quiz__balk .wrap{display:flex;align-items:center;gap:16px;height:64px}
+.quiz__terug{border:0;background:none;cursor:pointer;font:inherit;font-size:1rem;color:var(--grijs);display:flex;align-items:center;gap:7px;padding:8px 4px}
+.quiz__terug:disabled{opacity:.28;cursor:default}
+.quiz__tel{flex:1;text-align:center;font-family:"Montserrat",sans-serif;font-weight:700;font-size:1.05rem;color:var(--inkt);font-variant-numeric:tabular-nums;white-space:nowrap}
+.quiz__sluit{border:0;background:none;cursor:pointer;font-size:1.6rem;line-height:1;color:var(--grijs-licht);padding:4px 2px}
+.quiz__body{flex:1;display:flex;align-items:flex-start;padding:46px 0 124px}
+
+.quiz__body > .wrap{width:100%}
+@media(max-width:700px){.quiz__body{padding:26px 0 112px}}
+.quiz__scherm{max-width:660px;margin:0 auto;width:100%;animation:opkomst .3s cubic-bezier(.2,.7,.3,1)}
+@keyframes opkomst{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.quiz h2{font-size:clamp(1.6rem,4.2vw,2.2rem);margin-bottom:.32em}
+.quiz .hint{margin:0 0 26px;font-size:1.04rem}
+
+.opties{display:grid;gap:11px;margin:0 0 24px}
+.optie{
+  display:flex;align-items:center;gap:16px;width:100%;text-align:left;
+  background:var(--papier);border:1.5px solid var(--lijn);border-radius:13px;
+  padding:17px 19px;cursor:pointer;font:inherit;color:var(--grijs);
+  transition:border-color .14s ease, background .14s ease, transform .1s ease;
+}
+.optie:hover{border-color:var(--rood);background:var(--rood-zacht)}
+.optie:active{transform:scale(.995)}
+.optie.gekozen{border-color:var(--rood-diep);background:var(--rood-zacht);box-shadow:inset 0 0 0 1px var(--rood-diep)}
+.optie__vink{flex:none;width:25px;height:25px;border-radius:50%;border:1.5px solid var(--lijn);background:#fff;position:relative}
+.optie.gekozen .optie__vink{background:var(--rood-diep);border-color:var(--rood-diep)}
+.optie.gekozen .optie__vink::after{content:"";position:absolute;left:8.5px;top:5px;width:5px;height:10px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+
+.opties--multi .optie__vink{border-radius:7px}
+.optie__tekst b{display:block;font-family:"Montserrat",sans-serif;font-weight:700;font-size:1.06rem;line-height:1.3;color:var(--inkt)}
+.optie__tekst span{display:block;font-size:1rem;color:var(--grijs-licht);margin-top:2px}
+
+.veld{margin-bottom:17px}
+.veld label{display:block;font-family:"Montserrat",sans-serif;font-weight:700;font-size:1rem;margin-bottom:6px;color:var(--inkt)}
+.veld input,.veld textarea{width:100%;font:inherit;font-size:1.05rem;color:var(--inkt);padding:15px 16px;border:1.5px solid var(--lijn);border-radius:11px;background:var(--papier)}
+.veld input:focus,.veld textarea:focus{outline:0;border-color:var(--inkt);box-shadow:0 0 0 3px rgba(14,14,14,.12)}
+.veld .fout{color:var(--alarm);font-size:1rem;margin-top:6px;display:none}
+.veld.mis input{border-color:var(--alarm)}
+.veld.mis .fout{display:block}
+
+.veld{position:relative}
+.veld.goed input{border-color:var(--rood-diep);padding-right:46px}
+.veld.goed::after{content:"";position:absolute;right:17px;bottom:19px;width:7px;height:13px;
+  border:solid var(--rood-diep);border-width:0 2.6px 2.6px 0;transform:rotate(45deg);
+  animation:vinkje .18s ease}
+@keyframes vinkje{from{opacity:0;transform:rotate(45deg) scale(.6)}to{opacity:1;transform:rotate(45deg) scale(1)}}
+.hp{position:absolute!important;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+.keuzes{display:flex;flex-wrap:wrap;gap:10px;margin:0 0 26px}
+.keuzes--breed{flex-direction:column}
+.keuze{flex:1 1 auto;min-width:110px;min-height:60px;display:flex;flex-direction:column;justify-content:center;
+  gap:2px;text-align:left;padding:12px 18px;border:2px solid var(--lijn);background:var(--papier);
+  border-radius:12px;font:inherit;color:var(--inkt);cursor:pointer}
+.keuze b{font-weight:700}
+.keuze span{display:block;color:var(--grijs-licht)}
+.keuze.gekozen{border-color:var(--rood-diep);background:var(--rood-zacht)}
+.keuze.gekozen span{color:var(--grijs)}
+.veld__kop{font-family:"Montserrat",sans-serif;font-weight:700;color:var(--inkt);margin:0 0 10px}
+
+.quiz__actie{position:sticky;bottom:0;background:var(--papier);margin:26px -22px 0;
+  padding:14px 22px calc(14px + env(safe-area-inset-bottom));border-top:2px solid var(--lijn);z-index:3}
+.quiz__actie .btn{width:100%;min-height:60px}
+
+.quiz--typen .quiz__actie{position:static;margin:26px 0 0;padding:0;border-top:0}
+
+.zuster{border-top:1px solid var(--lijn);margin:26px 0 0;padding:18px 0 0}
+.zuster__nu{margin:0 0 10px;color:var(--grijs)}
+.zuster__wissel{display:block;width:100%;text-align:left;background:var(--papier-2);border:1px solid var(--lijn);
+  border-radius:12px;padding:14px 18px;min-height:60px;font:inherit;color:var(--inkt);font-weight:600;cursor:pointer}
+.zuster__wissel span{display:block;color:var(--grijs-licht);font-weight:400}
+.veld--vrij{margin:18px 0 0;animation:opkomst .22s ease}
+.quiz__nudge{margin:12px 0 0;color:var(--alarm);font-weight:600}
+.privacy{font-size:1rem;color:var(--grijs-licht);margin:16px 0 0}
+
+.uitslag__kaart{background:var(--papier);border:1px solid var(--lijn);border-radius:18px;padding:30px;margin:0 0 24px;box-shadow:var(--schaduw)}
+.uitslag__kaart h3{font-size:1.3rem;margin-bottom:.45em}
+.uitslag__punt{display:flex;gap:14px;padding:14px 0;border-top:1px solid var(--lijn);font-size:1.02rem}
+.uitslag__punt:first-of-type{border-top:0;padding-top:0}
+.uitslag__punt i{flex:none;width:27px;height:27px;border-radius:50%;background:var(--rood-zacht);border:1.5px solid var(--rood);position:relative;margin-top:2px}
+.uitslag__punt i::after{content:"";position:absolute;left:9.5px;top:6px;width:5px;height:11px;border:solid var(--rood-diep);border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+.uitslag__punt b{display:block;color:var(--inkt);font-family:"Montserrat",sans-serif}
+
+.dagen{display:grid;gap:22px;margin:0 0 26px}
+.dag__kop{font-family:"Montserrat",sans-serif;font-weight:700;font-size:1.04rem;margin:0 0 11px;color:var(--inkt)}
+.dag__kop span{font-weight:500;color:var(--grijs-licht)}
+.tijden{display:flex;flex-wrap:wrap;gap:9px}
+.tijd{border:1.5px solid var(--lijn);background:var(--papier);border-radius:11px;padding:14px 20px;cursor:pointer;font-family:"Montserrat",sans-serif;font-weight:700;font-size:1.04rem;color:var(--inkt);transition:all .14s ease}
+.tijd:hover{border-color:var(--rood)}
+.tijd.gekozen{background:var(--rood);border-color:var(--rood-diep);color:#fff}
+.geen-slots{background:var(--papier-2);border-radius:13px;padding:22px 24px;margin:0 0 24px}
+
+.klaar{text-align:center;padding:8px 0 16px}
+.klaar__vink{width:78px;height:78px;border-radius:50%;background:var(--rood);margin:0 auto 22px;position:relative;animation:pop .42s cubic-bezier(.2,1.5,.4,1)}
+.klaar__vink::after{content:"";position:absolute;left:27px;top:21px;width:17px;height:32px;border:solid #fff;border-width:0 5px 5px 0;transform:rotate(45deg)}
+.klaar h2{margin-bottom:.35em}
+
+.klaar__bellen{max-width:470px;margin:0 auto 22px;background:var(--rood-zacht);border:1px solid var(--rood);
+  border-radius:16px;padding:20px 22px;text-align:left}
+.klaar__nu{margin:16px 0 10px;font-family:"Montserrat",sans-serif;font-weight:700;color:var(--inkt)}
+.klaar__bellen .btn{width:100%}
+.klaar__bellen p{margin:0 0 4px;color:var(--grijs)}
+.klaar__nr{display:inline-block;font-family:"Montserrat",sans-serif;font-weight:700;font-size:1.34rem;
+  color:var(--inkt);text-decoration:none;padding:6px 0}
+
+.afspraak{background:var(--papier);border:1px solid var(--lijn);border-radius:16px;padding:22px;margin:0 auto 22px;max-width:470px;text-align:left}
+.afspraak b{display:block;font-family:"Montserrat",sans-serif;font-weight:700;font-size:1.24rem;color:var(--inkt);margin-bottom:4px}
+.afspraak span{display:block;color:var(--grijs-licht)}
+
+.tijdlijn{text-align:left;max-width:470px;margin:0 auto 24px;counter-reset:t}
+.tijdlijn h3{margin:0 0 14px;font-size:1.08rem}
+.tijdlijn ol{list-style:none;margin:0;padding:0}
+.tijdlijn li{position:relative;padding:0 0 18px 42px;counter-increment:t}
+.tijdlijn li::before{content:counter(t);position:absolute;left:0;top:-2px;width:28px;height:28px;border-radius:50%;
+  background:var(--rood);color:#fff;font-family:"Montserrat",sans-serif;font-weight:700;
+  display:flex;align-items:center;justify-content:center}
+.tijdlijn li::after{content:"";position:absolute;left:13px;top:30px;bottom:2px;width:2px;background:var(--lijn)}
+.tijdlijn li:last-child{padding-bottom:0}
+.tijdlijn li:last-child::after{display:none}
+.tijdlijn b{display:block;color:var(--inkt)}
+.tijdlijn span{color:var(--grijs)}
+
+.knoprij{display:flex;gap:11px;flex-wrap:wrap;justify-content:center}
+.foutmelding{background:#FBEEEA;border:1px solid var(--alarm);color:#7C2D18;border-radius:11px;padding:15px 18px;font-size:1rem;margin:0 0 18px;display:none}
+.foutmelding.aan{display:block}
+.laden{display:inline-block;width:17px;height:17px;border:2.5px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:draai .7s linear infinite}
+@keyframes draai{to{transform:rotate(360deg)}}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.01ms!important;transition-duration:.01ms!important}
+  html{scroll-behavior:auto}
+}
+
+/* ConnectFit-overrides: rood alleen in knoppen, labels en accentcijfers; vinkjes groen */
+body{font-size:17px;line-height:1.7}
+h1,h2,h3{font-weight:800;letter-spacing:-.02em}
+h1{font-size:clamp(2rem,4.2vw,3.05rem)}
+h2{font-size:clamp(1.55rem,3vw,2.2rem)}
+.quiz h2{font-size:clamp(1.45rem,3.6vw,1.95rem)}
+.hero{background:linear-gradient(168deg,#fff 0%,var(--papier-2) 100%)}
+.hero h1 span{color:#5a5a5a}
+.hero .eyebrow,.eyebrow{color:var(--rood);font-weight:700;font-size:.95rem}
+.sec--donker .eyebrow{color:#ff5a67}
+.btn{color:#fff}
+.btn--licht{color:var(--inkt)}
+.kop img{height:40px;filter:brightness(0)}
+.checks li::before,.uitslag__punt i{background:var(--vink-zacht);border-color:var(--vink)}
+.checks li::after,.uitslag__punt i::after{border-color:var(--vink)}
+.veld.goed input{border-color:var(--vink)}
+.veld.goed::after{border-color:var(--vink)}
+.klaar__vink{background:var(--vink)}
+.klaar__bellen{background:var(--papier-2);border-color:var(--lijn)}
+.optie:hover{border-color:var(--inkt);background:var(--papier-3)}
+.optie.gekozen{border-color:var(--inkt);background:var(--papier-3);box-shadow:inset 0 0 0 1px var(--inkt)}
+.optie.gekozen .optie__vink{background:var(--inkt);border-color:var(--inkt)}
+.verg__wij{background:var(--rood-zacht)}
+.verg__kop.verg__wij{background:var(--inkt);color:#fff}
+.onderzoek{background:var(--papier-2);border-left-color:var(--rood)}
+.onderzoek .cijfer{color:var(--rood)}
+.hero__antwoord{border-left-color:var(--rood)}
+@media(max-width:920px){.hero__kaart{background:var(--papier-2);border-top:1px solid var(--lijn)}}
+.faq summary::after{border-color:var(--rood)}
+
+</style>
+</head>
+<body data-funnel="egym-kennismaking" data-locatie="hoogeveen">
+
+<header class="kop">
+  <div class="wrap">
+    <a class="merk" href="#top">
+      <img src="assets/connectfit-logo-wit.png" alt="ConnectFit" width="200" height="140">
+      <span class="plaats">Hoogeveen</span>
+    </a>
+    <div class="kop__bewijs"><span class="ster">&#9733;&#9733;&#9733;&#9733;&#9733;</span> <b>4,9</b><span class="lang"> op Google, uit 107 reviews van ConnectFit Hoogeveen</span></div>
+    <button class="btn js-start" type="button">Kijk of het bij je past</button>
+  </div>
+</header>
+
+<main id="top">
+
+<section class="hero">
+  <div class="wrap hero__grid">
+    <div class="hero__kop">
+      <p class="eyebrow">EGYM in Hoogeveen vind je alleen bij ConnectFit</p>
+      <h1>Train heel je lichaam in 30 minuten.<br><span>Zonder uren in de sportschool.</span></h1>
+      <p class="hero__antwoord">Wil je 's avonds nog energie over hebben, en makkelijker de trap op? Dan begin je hier op jouw niveau, en je Fit-Coach bouwt je programma op wat jij weer wilt kunnen.</p>
+      <p class="hero__onder">Het EGYM-toestel herkent je aan je polsband en stelt zich op jou in. Aan de van Echtenstraat staan er 16. Nog nooit zo getraind? Geen zorgen, je begint op jouw niveau.</p>
+    </div>
+    <div class="hero__rest">
+      <ul class="checks">
+        <li><b>Neem plaats op een toestel dat al goed staat.</b> Zithoogte, weerstand en bewegingsbereik stellen zich in op jouw lichaam</li>
+        <li><b>Reserveer je plek vooraf.</b> Je wacht nooit op een toestel, ook niet tussen 17:30 en 20:30</li>
+        <li><b>Begin zonder ervaring.</b> Je programma staat klaar op het toestel en een Fit-Coach loopt rond</li>
+      </ul>
+      <div style="margin-top:32px">
+        <button class="btn btn--groot js-start" type="button">Kijk of het bij je past</button>
+        <p class="microcopy">De hoofdcoach belt je binnen 24 uur, vaak nog dezelfde dag.</p>
+      </div>
+    </div>
+    <div class="hero__foto">
+      <img src="assets/hoogeveen-egym-fitcoach.jpeg" alt="Een Fit-Coach begeleidt een sporter op een EGYM-toestel in Hoogeveen" width="1500" height="1000" fetchpriority="high">
+      <div class="hero__kaart">
+        <b>Je begint met een gratis kennismaking</b>
+        Met rondleiding, Bio-Age-meting en een proeftraining, zodat je weet waar je nu staat.
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec sec--alt">
+  <div class="wrap">
+    <div class="mid">
+      <p class="eyebrow">Voor wie dit is</p>
+      <h2>Vier redenen om het uit te stellen</h2>
+      <p class="lead">Herken je er een? Dit horen we bijna dagelijks van mensen die aan de van Echtenstraat binnenlopen.</p>
+    </div>
+    <div class="rijen">
+      <div class="rij">
+        <p class="zegt">&ldquo;Ik heb er de tijd niet voor.&rdquo;</p>
+        <p>Een EGYM-ronde duurt ongeveer 30 minuten, inclusief de wissels tussen de toestellen. We zijn elke dag open van 6:00 tot 22:00, dus je traint voor je werk, tussen twee afspraken door of 's avonds.</p>
+      </div>
+      <div class="rij">
+        <p class="zegt">&ldquo;Een sportschool is niks voor mij.&rdquo;</p>
+        <p>Een grote, drukke sportschool ook niet. Bij ons hangt geen spiegelwand en sta je niet in de rij bij een toestel. Het is een kleinschalige sportschool, waar onze Fit-Coaches rondlopen en je op weg helpen.</p>
+      </div>
+      <div class="rij">
+        <p class="zegt">&ldquo;Ik weet niet waar ik moet beginnen.&rdquo;</p>
+        <p>Dat hoef je ook niet te weten. Je Fit-Coach zet je programma op, het toestel stelt zich op jou in en het scherm wijst je door elke oefening. Jij hoeft alleen te komen.</p>
+      </div>
+      <div class="rij">
+        <p class="zegt">&ldquo;Ik ben eerder begonnen en weer gestopt.&rdquo;</p>
+        <p>Daarom reserveer je elke training vooraf in de app, net als een afspraak. Zo hoef je niet elke keer opnieuw te beslissen of je gaat. En elke tien weken kijk je met je Fit-Coach of je programma nog past.</p>
+      </div>
+    </div>
+    <div class="rijen__bollen" id="redenBollen" role="tablist" aria-label="Blader door de redenen"></div>
+    <div class="mid" style="margin-top:40px">
+      <button class="btn js-start" type="button">Kijk of het bij je past</button>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap duo duo--boven">
+    <div>
+      <p class="eyebrow">Hoe het werkt</p>
+      <h2>Zo train je heel je lichaam in 30 minuten</h2>
+      <p>Kracht die je niet onderhoudt, raak je kwijt. Je merkt het aan de boodschappentas, aan de trap, en aan hoe je van de grond omhoog komt na het spelen met de (klein)kinderen.</p>
+      <p>EGYM is krachttraining op een vaste route van toestellen die zich automatisch op jou instellen. Je meldt je met je polsband, het toestel herkent je en kent jouw standen. Acht oefeningen voor je belangrijkste spiergroepen, klaar in ongeveer 30 minuten.</p>
+      <p>Iedereen schuift op hetzelfde moment door naar het volgende toestel, dus je wacht niet en je hoeft niet te bedenken wat je hierna doet. Het scherm geeft je tempo aan, en het toestel past de weerstand aan naarmate je sterker wordt.</p>
+    </div>
+    <div>
+      <img src="assets/ruinen-egym-opstelling.jpg" alt="Een rij EGYM-toestellen met op elk toestel een scherm" width="2400" height="1600" loading="lazy">
+      <p class="microcopy" style="text-align:center">Zo staat een EGYM-ronde opgesteld. Deze foto is gemaakt op onze locatie in Ruinen.</p>
+    </div>
+  </div>
+  <div class="wrap">
+    <ul class="feitjes">
+      <li><span>Duur van een EGYM-ronde</span><b>Ongeveer 30 minuten</b></li>
+      <li><span>Oefeningen</span><b>Acht, voor je belangrijkste spiergroepen</b></li>
+      <li><span>EGYM-toestellen in Hoogeveen</span><b>16</b></li>
+      <li><span>Begeleiding</span><b>Fit-Coaches lopen rond tijdens 40+ bemande uren per week</b></li>
+      <li><span>Open</span><b>Elke dag van 6:00 tot 22:00</b></li>
+      <li><span>Wachten op een toestel</span><b>Niet nodig, je reserveert vooraf</b></li>
+    </ul>
+  </div>
+  <div class="wrap">
+    <div class="mid" style="margin-top:40px">
+      <div class="knoppen">
+        <button class="btn btn--groot js-start" type="button">Kijk of het bij je past</button>
+        <button class="btn btn--licht js-info" type="button">Stuur mij alle informatie</button>
+      </div>
+      <p class="microcopy">Gratis. Je beslist pas na afloop.</p>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap">
+    <h2>Grote sportschool, personal trainer of EGYM</h2>
+    <p style="max-width:62ch">Je hebt dit waarschijnlijk al eens geprobeerd. Een pasje dat na maart in de la lag, of een trainer die goed was maar te duur. Dat lag niet aan je motivatie. Het lag aan wat het je elke week kostte.</p>
+    <div class="verg__rol">
+      <div class="verg">
+        <div class="verg__raster">
+          <div class="verg__cel verg__kop verg__wat"></div>
+          <div class="verg__cel verg__kop verg__wij">EGYM bij ConnectFit</div>
+          <div class="verg__cel verg__kop">Grote sportschool</div>
+          <div class="verg__cel verg__kop">Personal trainer</div>
+      <div class="verg__cel verg__wat">Wat je moet doen</div>
+      <div class="verg__cel verg__wij"><b>staat klaar op het toestel</b></div>
+      <div class="verg__cel">zelf uitzoeken</div>
+      <div class="verg__cel">de trainer zegt het</div>
+      <div class="verg__cel verg__wat">Toestellen instellen</div>
+      <div class="verg__cel verg__wij"><b>gaat vanzelf</b></div>
+      <div class="verg__cel">zelf verzetten</div>
+      <div class="verg__cel">doet de trainer</div>
+      <div class="verg__cel verg__wat">Wachten op een toestel</div>
+      <div class="verg__cel verg__wij"><b>nee, je reserveert</b></div>
+      <div class="verg__cel">op drukke uren wel</div>
+      <div class="verg__cel">nee</div>
+      <div class="verg__cel verg__wat">Iemand die meekijkt</div>
+      <div class="verg__cel verg__wij"><b>een Fit-Coach die rondloopt</b></div>
+      <div class="verg__cel">meestal niet</div>
+      <div class="verg__cel">ja, de hele sessie</div>
+      <div class="verg__cel verg__wat">Zien of je sterker wordt</div>
+      <div class="verg__cel verg__wij"><b>per spiergroep in de app</b></div>
+      <div class="verg__cel">zelf bijhouden</div>
+      <div class="verg__cel">via de trainer</div>
+      <div class="verg__cel verg__wat">Kosten per maand</div>
+      <div class="verg__cel verg__wij"><b>ertussenin</b></div>
+      <div class="verg__cel">laag</div>
+      <div class="verg__cel">hoog</div>
+        </div>
+      </div>
+      <div class="verg__schaduw" aria-hidden="true"></div>
+    </div>
+    <div class="verg__bollen" id="vergBollen" aria-label="Blader door de kolommen"></div>
+  </div>
+</section>
+
+<section class="sec sec--alt">
+  <div class="wrap duo duo--om">
+    <div>
+      <img src="assets/hoogeveen-bioage-scan.jpeg" alt="Een Fit-Coach neemt de Bio-Age-uitslag door met een sporter bij de EGYM Fitness Hub" width="1000" height="1500" loading="lazy" style="max-height:620px;width:100%;object-fit:cover">
+    </div>
+    <div>
+      <p class="eyebrow">Waar je staat</p>
+      <h2>Je startpunt in één getal</h2>
+      <p>Voordat je begint doe je een Bio-Age-meting. Die loopt via de EGYM Fitness Hub en de InBody-bodyanalyse. Je mobiliteit, je lengte, je gewicht, je vetpercentage, je conditie en je kracht worden samen vertaald naar één getal, je fitheidsleeftijd.</p>
+      <p>Daar bouwt je Fit-Coach je EGYM-programma op. De meting hoort bij de gratis kennismaking, ook als je daarna geen lid wordt.</p>
+      <div class="onderzoek">
+        <div class="cijfer">10</div>
+        <p><strong>weken later meet je opnieuw.</strong> Dan zie je zwart op wit wat er veranderd is, en stel je samen met je Fit-Coach nieuwe doelen.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec sec--donker">
+  <div class="wrap">
+    <div class="mid">
+      <p class="eyebrow">Wat er gebeurt als je komt</p>
+      <h2>Een uur, en je weet waar je staat</h2>
+      <p class="lead">Je krijgt een rondleiding, je doet de meting en je traint een keer mee. Aan het eind weet je hoe je ervoor staat en welk programma bij je past.</p>
+    </div>
+    <div class="stappen">
+      <div class="stap">
+        <h3>Je vertelt wat je weer wilt kunnen</h3>
+        <p>Een gesprek met je Fit-Coach over waar je tegenaan loopt, wat je eerder aan sport hebt gedaan en wanneer je tijd hebt.</p>
+      </div>
+      <div class="stap">
+        <h3>Je doet de Bio-Age-meting</h3>
+        <p>Kracht, conditie, mobiliteit en lichaamssamenstelling in één sessie. Zo weet je bij de volgende meting precies wat er veranderd is.</p>
+      </div>
+      <div class="stap">
+        <h3>Je traint een keer mee</h3>
+        <p>Een echte proeftraining op de EGYM-toestellen. Daarna hoor je welke twee programma's bij jou passen en wat ze kosten. Je beslist zelf.</p>
+      </div>
+    </div>
+    <div class="stappen__bollen" id="stapBollen" aria-label="Blader door de stappen"></div>
+    <div class="mid" style="margin-top:46px">
+      <div class="knoppen">
+        <button class="btn btn--groot js-start" type="button">Kijk of het bij je past</button>
+        <button class="btn btn--licht js-info" type="button">Stuur mij alle informatie</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap">
+    <div class="mid">
+      <p class="eyebrow">Wat leden zeggen</p>
+      <h2>Wat leden in Hoogeveen zeggen</h2>
+    </div>
+    <div class="quotes">
+    <div class="quote-kaart">
+      <div class="sterren">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+      <blockquote>&ldquo;Geen gedoe met instellen van de apparaten&rdquo;</blockquote>
+      <p>Het is heel fijn sporten bij Connect Fit. Geen gedoe met instellen van de apparaten en geen wachttijd bij de apparaten.</p>
+      <div class="wie">Wilma Wolting &middot; via Google</div>
+    </div>
+    <div class="quote-kaart">
+      <div class="sterren">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+      <blockquote>&ldquo;Heel simpel, maar de EGYM helpt mij&rdquo;</blockquote>
+      <p>Ik ben nu 3 maanden actief bij ConnectFit en ik doe het programma fit in 30 minuten.</p>
+      <div class="wie">Marion Cairo &middot; via Google</div>
+    </div>
+    <div class="quote-kaart">
+      <div class="sterren">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+      <blockquote>&ldquo;Voel me nu al fitter en heb meer energie&rdquo;</blockquote>
+      <p>Net een aantal weken begonnen. Ook super blij met de ruime openingstijden.</p>
+      <div class="wie">Moniek Kemink-Pieters &middot; via Google</div>
+    </div></div><p class="microcopy" style="text-align:center;margin-top:22px"><a href="https://www.google.com/maps/search/?api=1&amp;query=ConnectFit+Hoogeveen+van+Echtenstraat+37" target="_blank" rel="noopener">Lees alle 107 reviews op Google</a></p>
+    <div class="quotes__bollen" id="quotesBollen" aria-label="Blader door de reviews"></div>
+  </div>
+</section>
+
+<section class="sec sec--alt">
+  <div class="wrap">
+    <div class="mid">
+      <p class="eyebrow">Wie je treft</p>
+      <h2>Een Fit-Coach die rondloopt</h2>
+      <p class="lead">Het toestel stelt zich in, maar het ziet niet dat je moe bent of dat je schouder opspeelt. Daarvoor lopen onze Fit-Coaches rond.</p>
+    </div>
+    <div class="trainer">
+    <div><figure class="scene-fig">
+        <img class="scene" src="assets/ruinen-egym-begeleiding.jpg" alt="Een Fit-Coach kijkt mee terwijl een sporter op een EGYM-toestel traint" width="660" height="440" loading="lazy">
+        <figcaption>Zo kijkt een Fit-Coach mee tijdens je ronde. Deze foto is gemaakt op onze locatie in Ruinen.</figcaption>
+      </figure></div>
+    <div>
+      <p>Onze Fit-Coaches lopen rond tijdens 40+ bemande uren per week, meestal tussen 8:00 en 12:00 en tussen 17:30 en 20:30. Ze stellen je programma bij en zeggen het als je te licht of te zwaar traint.</p>
+      <p style="margin:0 0 26px">Loop je vast op een schouder of knie? Fysiotherapie en personal training zitten onder hetzelfde dak, aan de van Echtenstraat 37.</p>
+      <div class="knoppen knoppen--links">
+        <button class="btn btn--groot js-start" type="button">Maak kennis met je Fit-Coach</button>
+        <button class="btn btn--licht js-info" type="button">Stuur mij alle informatie</button>
+      </div>
+    </div>
+  </div>
+  </div>
+</section>
+
+<section class="sec">
+  <div class="wrap" style="max-width:850px">
+    <div class="mid">
+      <p class="eyebrow">Eerlijk antwoord</p>
+      <h2>Wat mensen ons meestal eerst vragen</h2>
+    </div>
+    <div class="faq">
+      <details open>
+        <summary>Ik ben ruim zestig en heb jaren niets gedaan. Is dit iets voor mij?</summary>
+        <div class="antwoord"><p>Ja. Bij de kennismaking meet je eerst waar je nu staat, en daar begint je programma. De toestellen stellen zich in op jouw kracht en bewegingsbereik, dus je traint op jouw niveau. Er is geen niveau waaraan je moet voldoen.</p></div>
+      </details>
+      <details>
+        <summary>Ik heb rugklachten. Of ik ben geopereerd. Kan dat kwaad?</summary>
+        <div class="antwoord"><p>Vertel het bij de kennismaking, dan houdt je Fit-Coach er rekening mee bij het instellen van de toestellen. In Hoogeveen zit de fysiotherapie in hetzelfde pand. Twijfel je, overleg dan eerst met je huisarts of fysiotherapeut. Die beslissing nemen wij niet voor je.</p></div>
+      </details>
+      <details>
+        <summary>Wat kost het daarna?</summary>
+        <div class="antwoord"><p>Dat hangt af van het programma en van hoelang je kiest, van een maand tot anderhalf jaar. Aan het eind van de kennismaking stelt je Fit-Coach twee programma's voor die bij jou passen, met de exacte prijs erbij. Je beslist pas daarna.</p></div>
+      </details>
+      <details>
+        <summary>Loopt er altijd een Fit-Coach rond?</summary>
+        <div class="antwoord"><p>Niet altijd. Onze Fit-Coaches lopen rond tijdens 40+ bemande uren per week, meestal tussen 8:00 en 12:00 en tussen 17:30 en 20:30. Train je op een ander moment? Geen probleem. Je programma staat klaar op het toestel, elke oefening heeft een instructie op het scherm en de toestellen gaan naar de standen die je Fit-Coach heeft vastgelegd.</p></div>
+      </details>
+      <details>
+        <summary>Is een training van 30 minuten niet te kort?</summary>
+        <div class="antwoord"><p>Voor een EGYM-ronde niet. Je doet acht oefeningen voor je belangrijkste spiergroepen, en omdat iedereen tegelijk doorschuift sta je niet te wachten. In Hoogeveen zit er ook een cardiotoestel in de ronde, dus je traint kracht en conditie in dezelfde sessie. Hoe vaak je komt, bespreek je met je Fit-Coach.</p></div>
+      </details>
+      <details>
+        <summary>Krijg ik een verkooppraatje?</summary>
+        <div class="antwoord"><p>Je hoort aan het eind wat het kost, dat is wel zo eerlijk. Je Fit-Coach stelt twee programma's voor die bij je passen. Wil je er eerst over nadenken? Geen probleem, je hoeft niet meteen te beslissen.</p></div>
+      </details>
+      <details>
+        <summary>Wat als ik een keer niet kan?</summary>
+        <div class="antwoord"><p>Dan kies je in de app een ander moment. We zijn elke dag open van 6:00 tot 22:00.</p></div>
+      </details>
+      <details>
+        <summary>Hoe snel hoor ik iets?</summary>
+        <div class="antwoord"><p>De hoofdcoach van jouw locatie belt je binnen 24 uur, vaak nog dezelfde dag. Samen plannen jullie een moment voor je kennismaking.</p></div>
+      </details>
+    </div>
+    <div class="mid" style="margin-top:40px">
+      <div class="knoppen">
+        <button class="btn btn--groot js-start" type="button">Kijk of het bij je past</button>
+        <button class="btn btn--licht js-info" type="button">Stuur mij alle informatie</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec sec--alt">
+  <div class="wrap">
+    <div class="praktisch">
+      <div>
+        <p class="eyebrow">Waar je heen gaat</p>
+        <h2>ConnectFit Hoogeveen</h2>
+        <ul class="feitjes">
+          <li><span>Adres</span><b>van Echtenstraat 37<br>7902 EK Hoogeveen</b></li>
+          <li><span>Telefoon</span><b><a href="tel:0528449133">0528 449 133</a></b></li>
+        </ul>
+        <p style="margin-top:26px"><strong>Open</strong><br>elke dag van 6:00 tot 22:00<br>Fit-Coaches lopen rond: meestal 8:00 - 12:00 en 17:30 - 20:30</p>
+        <p class="microcopy">Trainen gaat op reservering, zodat je plek klaarstaat. Vraag een kennismaking aan, dan belt de hoofdcoach je om een moment te plannen. Woon je dichter bij Nieuwlande of Ruinen? Dat kies je in de check.</p>
+      </div>
+      <div class="kaartje"><iframe src="https://www.google.com/maps?q=van+Echtenstraat+37,+7902+EK+Hoogeveen&amp;output=embed" title="Kaart met de locatie van ConnectFit Hoogeveen" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec sec--donker">
+  <div class="wrap mid" style="max-width:760px">
+    <p class="eyebrow">Tot slot</p>
+    <h2>Lezen kan altijd nog</h2>
+    <p class="lead">Je kunt blijven lezen of 30 minuten genoeg is. Je kunt het ook een keer voelen. Dat kost je een uur, en verder niets.</p>
+    <div style="margin-top:32px">
+      <div class="knoppen">
+        <button class="btn btn--groot js-start" type="button">Kijk of het bij je past</button>
+        <button class="btn btn--licht js-info" type="button">Stuur mij alle informatie</button>
+      </div>
+      <p class="microcopy">Gratis. Je beslist pas na afloop.</p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="voet">
+  <div class="wrap">
+    <div>ConnectFit Hoogeveen &middot; van Echtenstraat 37, 7902 EK Hoogeveen</div><div><a href="tel:0528449133">0528 449 133</a> &middot; <a href="mailto:info@connectfit.nl">info@connectfit.nl</a></div>
+  </div>
+</footer>
+
+<div class="cookie" id="cookieBanner" role="dialog" aria-live="polite" aria-label="Cookies" hidden>
+  <div class="cookie__in">
+    <p><b>Mogen we meten hoe deze pagina het doet?</b> We gebruiken cookies om te zien welke advertentie
+    je hierheen bracht en wat er op de pagina gebeurt. Kies je voor alleen noodzakelijk, dan werkt
+    alles gewoon en meten we niets.</p>
+    <div class="cookie__knoppen">
+      <button class="btn btn--licht" type="button" id="cookieNee">Alleen noodzakelijk</button>
+      <button class="btn" type="button" id="cookieJa">Accepteren</button>
+    </div>
+  </div>
+</div>
+
+<div class="sticky"><button class="btn js-start" type="button">Kijk of het bij je past</button></div>
+
+<div class="quiz" id="quiz" role="dialog" aria-modal="true" aria-label="Check of EGYM bij je past">
+  <div class="quiz__balk">
+    <div class="wrap">
+      <button class="quiz__terug" id="qTerug" type="button">&larr; Terug</button>
+      <div class="quiz__tel" id="qTel"></div>
+      <button class="quiz__sluit" id="qSluit" type="button" aria-label="Sluiten">&times;</button>
+    </div>
+  </div>
+  <div class="quiz__body">
+    <div class="wrap"><div class="quiz__scherm" id="qScherm"></div></div>
+  </div>
+</div>
+
+<script>
+/* ============ Instellingen ============ */
+var LEAD_ENDPOINT = ''; /* Zapier-webhook of /api/lead. Leeg = geen verzending, alleen console. */
+
+window.CFG = {
+  slug: 'hoogeveen',
+  telefoon: '0528 449 133',
+  telefoon_link: '0528449133',
+  locaties: {
+    hoogeveen: { naam: 'Hoogeveen', adres: 'van Echtenstraat 37, Hoogeveen' },
+    nieuwlande: { naam: 'Nieuwlande', adres: 'Brugstraat 90, Nieuwlande' },
+    ruinen: { naam: 'Ruinen', adres: 'Voor de Blanken 17, Ruinen' }
+  },
+  popup: {
+    aan: true,
+    kop: 'Wil je er eerst rustig over lezen?',
+    tekst: 'Laat je gegevens achter, dan stuurt onze hoofdcoach je hoe EGYM werkt en welke programma\'s er zijn. Dan kun je er thuis over nadenken.',
+    knop: 'Stuur mij alle informatie',
+    klein: 'Je zit nergens aan vast.',
+    anders: 'Ik doe liever meteen de check',
+    bedankt_kop: 'Onderweg',
+    bedankt_tekst: 'De hoofdcoach neemt binnen 24 uur contact met je op, vaak nog dezelfde dag.'
+  }
+};
+
+/* ============ Meten: CF-helper als die er is, anders dataLayer ============ */
+window.cfMeet = function (naam, extra) {
+  if (window.CF && typeof CF.event === 'function') { try { CF.event(naam, extra || {}); return; } catch (e) {} }
+  window.dataLayer = window.dataLayer || [];
+  var d = { event: naam, funnel: 'egym-kennismaking', locatie: CFG.slug };
+  if (extra) { for (var k in extra) { if (Object.prototype.hasOwnProperty.call(extra, k)) d[k] = extra[k]; } }
+  try { window.dataLayer.push(d); } catch (e) {}
+};
+window.cfPixel = function (naam, extra) {
+  if (window.fbq) { try { fbq('track', naam, extra || {}); } catch (e) {} }
+};
+window.cfStuur = function (lading) {
+  if (!LEAD_ENDPOINT) {
+    try { console.warn('LEAD_ENDPOINT is leeg, lead niet verstuurd:', lading); } catch (e) {}
+    return Promise.resolve({ ok: true });
+  }
+  return fetch(LEAD_ENDPOINT, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(lading) })
+    .then(function (r) { return { ok: r.ok }; })
+    .catch(function () { return { ok: false }; });
+};
+window.cfUtms = function () {
+  var p = new URLSearchParams(location.search), o = {};
+  ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'fbclid', 'gclid'].forEach(function (k) {
+    if (p.get(k)) o[k] = p.get(k);
+  });
+  return o;
+};
+cfMeet('lp_view');
+
+/* ============ Cookiebanner ============ */
+(function () {
+  var SLEUTEL = 'cf_consent_keuze';
+  var banner = document.getElementById('cookieBanner');
+  if (!banner) return;
+  try { if (localStorage.getItem(SLEUTEL)) return; } catch (e) {}
+
+  function sluit() {
+    banner.classList.remove('aan');
+    document.body.classList.remove('cookie-open');
+    setTimeout(function () { banner.hidden = true; }, 300);
+  }
+  function kies(keuze) {
+    try { localStorage.setItem(SLEUTEL, keuze); } catch (e) {}
+    if (window.CF && typeof CF.consent === 'function') {
+      CF.consent({ analytics: keuze === 'alles', marketing: keuze === 'alles' });
+    }
+    if (keuze === 'alles' && window.fbq) { try { fbq('consent', 'grant'); } catch (e) {} }
+    cfMeet('consent_keuze', { keuze: keuze });
+    sluit();
+  }
+  document.getElementById('cookieJa').addEventListener('click', function () { kies('alles'); });
+  document.getElementById('cookieNee').addEventListener('click', function () { kies('noodzakelijk'); });
+  setTimeout(function () {
+    banner.hidden = false;
+    document.body.classList.add('cookie-open');
+    requestAnimationFrame(function () { banner.classList.add('aan'); });
+  }, 1200);
+})();
+</script>
+
+<script>
+/* ============ Check (quiz) ============ */
+(function () {
+  'use strict';
+
+  var CFG = window.CFG || {};
+  var quiz = document.getElementById('quiz');
+  var scherm = document.getElementById('qScherm');
+  var tel = document.getElementById('qTel');
+  var terug = document.getElementById('qTerug');
+  var sluit = document.getElementById('qSluit');
+
+  var start = Date.now();
+  var stap = 0;
+  var antwoorden = {};
+  var lead = {};
+  var leadVerstuurd = false;
+  var terugNavigatie = false;
+  var BEWAARSLEUTEL = 'cf_check_' + (CFG.slug || 'locatie');
+
+  var VRAGEN = [
+    {
+      id: 'doel',
+      vraag: 'Wat wil je over een halfjaar weer makkelijk kunnen?',
+      hint: 'Je mag er meerdere aanklikken. Wat je als eerste kiest telt het zwaarst.',
+      multi: true,
+      minEen: true,
+      opties: [
+        { w: 'trap', b: 'De trap op zonder buiten adem te raken' },
+        { w: 'energie', b: 'De dag doorkomen zonder in te storten' },
+        { w: 'kracht', b: 'Weer sterker worden', s: 'Boodschappen, (klein)kinderen, een zware tas' },
+        { w: 'klachten', b: 'Minder last van mijn rug, nek of knieën' },
+        { w: 'behouden', b: 'Fit blijven zoals ik nu ben', s: 'En voorkomen dat het minder wordt' },
+        { w: 'anders', b: 'Iets anders', s: 'Schrijf het in je eigen woorden', vrij: 'Waar denk je aan?' }
+      ]
+    },
+    {
+      id: 'drempel',
+      vraag: 'Wat houdt je tegen?',
+      hint: 'Meestal is het er meer dan een. Klik aan wat klopt.',
+      multi: true,
+      minEen: true,
+      opties: [
+        { w: 'tijd', b: 'Ik heb er de tijd niet voor' },
+        { w: 'sportschool', b: 'Een sportschool is niks voor mij' },
+        { w: 'beginnen', b: 'Ik weet niet waar ik zou moeten beginnen' },
+        { w: 'volhouden', b: 'Ik ben eerder begonnen en weer gestopt' },
+        { w: 'lijf', b: 'Ik ben bang dat mijn lijf het niet aankan' },
+        { w: 'anders', b: 'Iets anders', s: 'Schrijf het in je eigen woorden', vrij: 'Wat houdt je tegen?' }
+      ]
+    },
+    {
+      id: 'locatie',
+      vraag: 'Welke locatie ligt voor jou het handigst?',
+      hint: 'Daar komt je aanvraag terecht, bij de hoofdcoach van die locatie.',
+      opties: Object.keys(CFG.locaties || {}).map(function (k) {
+        return { w: k, b: 'ConnectFit ' + CFG.locaties[k].naam, s: CFG.locaties[k].adres };
+      })
+    }
+  ];
+
+  var TOTAAL = VRAGEN.length + 2;
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function voornaam() { return (lead.naam || '').trim().split(/\s+/)[0] || ''; }
+  function locatie() { var l = (CFG.locaties || {})[antwoorden.locatie || CFG.slug]; return l || { naam: 'Hoogeveen', adres: '' }; }
+
+  function uitslagPunten() {
+    var a = antwoorden, p = [];
+
+    var DOEL = {
+      trap: ['Je wilt de trap weer op zonder te hijgen', 'Bij de Bio-Age-meting zie je hoe je kracht en conditie er nu voor staan. Je Fit-Coach bouwt je programma daarop, en bij de volgende meting zie je wat er veranderd is.'],
+      energie: ['Je wilt de dag doorkomen zonder in te storten', 'Een EGYM-ronde duurt ongeveer 30 minuten, dus je houdt tijd over voor de rest van je dag. Hoe vaak je komt, bespreek je met je Fit-Coach.'],
+      kracht: ['Je wilt weer sterker worden', 'Daar is EGYM voor gebouwd. Na elke training zie je in de ConnectFit-app per spiergroep hoeveel je hebt getild, en het toestel past de weerstand aan naarmate je sterker wordt.'],
+      klachten: ['Je hebt last van je rug, nek of knieën', 'Vertel het bij de kennismaking. Je Fit-Coach stelt de toestellen in op jouw bewegingsbereik. Twijfel je, overleg dan eerst met je huisarts of fysiotherapeut.'],
+      behouden: ['Je wilt houden wat je hebt', 'Met de Bio-Age-meting leg je vast waar je nu staat. Elke tien weken meet je opnieuw, zodat je ziet of je het vasthoudt.']
+    };
+
+    var DREMPEL = {
+      tijd: ['Tijd is je grootste bezwaar', 'Een EGYM-ronde duurt ongeveer 30 minuten, inclusief de wissels tussen de toestellen. We zijn elke dag open van 6:00 tot 22:00, dus je kiest zelf een moment voor of na je werk.'],
+      sportschool: ['Je moet niets hebben van een sportschool', 'Dat horen we vaker. Er hangt geen spiegelwand en je staat niet in de rij, want je reserveert je plek vooraf. Onze Fit-Coaches lopen rond en helpen je op weg.'],
+      beginnen: ['Je weet niet waar je moet beginnen', 'Dat hoeft ook niet. Je programma staat klaar op het toestel en het scherm wijst je door elke oefening. De eerste keer loop je de ronde samen met je Fit-Coach.'],
+      volhouden: ['Je bent eerder begonnen en weer gestopt', 'Daarom reserveer je elke training vooraf in de app, net als een afspraak. En elke tien weken kijk je met je Fit-Coach of je programma nog past.'],
+      lijf: ['Je twijfelt of je lijf het aankan', 'Geen zorgen, je begint op jouw niveau. Het toestel stelt zich in op jouw kracht en bewegingsbereik, en je Fit-Coach kijkt mee.']
+    };
+
+    function lijst(x) { return Array.isArray(x) ? x : (x ? [x] : []); }
+    function eigenWoorden(id) { return String(a[id + '_vrij'] || '').trim(); }
+
+    lijst(a.doel).slice(0, 2).forEach(function (w) {
+      if (DOEL[w]) { p.push(DOEL[w]); return; }
+      if (w !== 'anders') return;
+      var eigen = eigenWoorden('doel');
+      p.push(eigen
+        ? ['Je wilt: ' + eigen, 'Dat gaat zo mee naar de hoofdcoach. Bij de kennismaking begint het gesprek daarmee, dus je hoeft het niet opnieuw uit te leggen.']
+        : ['Je hebt een eigen doel voor ogen', 'Vertel het bij de kennismaking. Daar begint het gesprek mee, en je Fit-Coach bouwt je programma daarop.']);
+    });
+    lijst(a.drempel).slice(0, 2).forEach(function (w) {
+      if (DREMPEL[w]) { p.push(DREMPEL[w]); return; }
+      if (w !== 'anders') return;
+      var eigen = eigenWoorden('drempel');
+      if (eigen) p.push(['Wat je tegenhoudt: ' + eigen, 'De hoofdcoach weet het voordat je binnenkomt, dus je hoeft er zelf niet over te beginnen.']);
+    });
+
+    var VULLING = [
+      ['Heel je lichaam in ongeveer 30 minuten', 'Acht oefeningen voor je belangrijkste spiergroepen. Het toestel herkent je aan je polsband en kent jouw standen.'],
+      ['Je begint met een gratis kennismaking', 'Met rondleiding, Bio-Age-meting en een proeftraining. Zo weet je waar je nu staat.']
+    ];
+    for (var v = 0; p.length < 2 && v < VULLING.length; v++) p.push(VULLING[v]);
+
+    return p.slice(0, 5);
+  }
+
+  function leesbareAntwoorden() {
+    return VRAGEN.map(function (v) {
+      var gekozen = antwoorden[v.id];
+      if (!gekozen || (Array.isArray(gekozen) && !gekozen.length)) return null;
+      var waarden = Array.isArray(gekozen) ? gekozen : [gekozen];
+      var labels = waarden.map(function (w) {
+        var o = v.opties.filter(function (x) { return x.w === w; })[0];
+        return o ? o.b : w;
+      });
+      var extra = antwoorden[v.id + '_vrij'];
+      if (extra) labels.push('eigen woorden: ' + extra);
+      return v.vraag + '\n  ' + labels.join(', ');
+    }).filter(Boolean).join('\n');
+  }
+
+  function verstuur(soort) {
+    cfMeet(soort === 'INFO' ? 'lead_informatie' : 'lead_aanvraag', { soort: soort });
+    return cfStuur({
+      soort: soort,
+      funnel: 'egym-kennismaking',
+      locatie: locatie().naam,
+      naam: lead.naam,
+      email: lead.email,
+      telefoon: lead.telefoon,
+      antwoorden: antwoorden,
+      antwoordenTekst: leesbareAntwoorden(),
+      website: lead.website || '',
+      verstreken: Date.now() - start,
+      pagina: location.href,
+      utm: cfUtms()
+    });
+  }
+
+  function vrijVeld(v) {
+    var optie = v.opties.filter(function (o) { return o.vrij; })[0];
+    if (!optie) return '';
+    var gekozen = antwoorden[v.id];
+    var aan = Array.isArray(gekozen) ? gekozen.indexOf(optie.w) > -1 : gekozen === optie.w;
+    if (!aan) return '';
+    return '<div class="veld veld--vrij"><label for="qVrij">' + esc(optie.vrij) + '</label>' +
+      '<input id="qVrij" type="text" autocomplete="off" maxlength="120" ' +
+      'value="' + esc(antwoorden[v.id + '_vrij'] || '') + '" placeholder="Hoeft niet, maar het mag"></div>';
+  }
+
+  function toonVraag(i) {
+    var v = VRAGEN[i];
+    var gekozen = antwoorden[v.id];
+    scherm.innerHTML = '<h2>' + esc(v.vraag) + '</h2>' +
+      (v.hint ? '<p class="hint">' + esc(v.hint) + '</p>' : '') +
+      '<div class="opties' + (v.multi ? ' opties--multi' : '') + '">' +
+      v.opties.map(function (o) {
+        var aan = v.multi ? (gekozen || []).indexOf(o.w) > -1 : gekozen === o.w;
+        return '<button class="optie' + (aan ? ' gekozen' : '') + '" type="button" data-w="' + esc(o.w) + '">' +
+          '<span class="optie__vink"></span><span class="optie__tekst"><b>' + esc(o.b) + '</b>' +
+          (o.s ? '<span>' + esc(o.s) + '</span>' : '') + '</span></button>';
+      }).join('') +
+      '</div>' +
+      vrijVeld(v) +
+      '<div class="quiz__actie">' +
+      '<p class="quiz__nudge" id="qNudge" hidden>Kies er eerst een, dan gaan we verder.</p>' +
+      '<button class="btn btn--groot" id="qVerder" type="button">Verder</button>' +
+      '</div>';
+
+    scherm.querySelectorAll('.optie').forEach(function (knop) {
+      knop.addEventListener('click', function () {
+        var w = knop.dataset.w;
+        if (v.multi) {
+          var huidig = antwoorden[v.id] || [];
+          huidig = huidig.indexOf(w) > -1 ? huidig.filter(function (x) { return x !== w; }) : huidig.concat([w]);
+          antwoorden[v.id] = huidig;
+          toonVraag(i);
+        } else {
+          antwoorden[v.id] = w;
+          toonVraag(i);
+        }
+      });
+    });
+
+    var vrij = document.getElementById('qVrij');
+    if (vrij) {
+      vrij.addEventListener('input', function () { antwoorden[v.id + '_vrij'] = vrij.value; });
+      if (document.activeElement !== vrij && !antwoorden[v.id + '_vrij']) vrij.focus();
+    }
+
+    document.getElementById('qVerder').addEventListener('click', function () {
+      var klaar = v.multi ? (!v.minEen || (antwoorden[v.id] || []).length > 0) : !!antwoorden[v.id];
+      var nudge = document.getElementById('qNudge');
+      if (!klaar) { if (nudge) nudge.hidden = false; return; }
+      if (nudge) nudge.hidden = true;
+      if (window.CF && typeof CF.step === 'function') { try { CF.step(stap + 1, v.id, String(antwoorden[v.id])); } catch (e) {} }
+      else cfMeet('quiz_step', { stap: stap + 1, vraag: v.id, antwoord: String(antwoorden[v.id]) });
+      ga(stap + 1);
+    });
+  }
+
+  function toonGegevens() {
+    scherm.innerHTML =
+      '<h2>Je uitslag staat klaar</h2>' +
+      '<p class="hint">Nog even je gegevens, dan zie je meteen wat EGYM in jouw situatie betekent.</p>' +
+      '<div class="foutmelding" id="qFout"></div>' +
+      '<form id="qForm" novalidate>' +
+      '<div class="veld"><label for="fNaam">Je naam</label><input id="fNaam" name="naam" type="text" autocomplete="name" value="' + esc(lead.naam || '') + '"><span class="fout">Vul je naam in.</span></div>' +
+      '<div class="veld"><label for="fMail">E-mailadres</label><input id="fMail" name="email" type="email" inputmode="email" autocomplete="email" value="' + esc(lead.email || '') + '"><span class="fout">Dit e-mailadres klopt niet.</span></div>' +
+      '<div class="veld"><label for="fTel">Telefoonnummer</label><input id="fTel" name="telefoon" type="tel" inputmode="tel" autocomplete="tel" value="' + esc(lead.telefoon || '') + '"><span class="fout">Vul een telefoonnummer in.</span></div>' +
+      '<div class="hp"><label>Laat dit veld leeg<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>' +
+      '<p class="privacy">Je gegevens gaan alleen naar de hoofdcoach van ConnectFit ' + esc(locatie().naam) + '.</p>' +
+      '<div class="quiz__actie">' +
+      '<button class="btn btn--groot" type="submit" id="qVerzend">Bekijk mijn uitslag</button>' +
+      '</div>' +
+      '</form>';
+
+    var form = document.getElementById('qForm');
+    var fout = document.getElementById('qFout');
+    var REGELS = {
+      naam: function (v) { return v.trim().length >= 2; },
+      email: function (v) { return /^[^@\s]+@[^@\s.]+\.[^@\s]+$/.test(v.trim()); },
+      telefoon: function (v) { return v.replace(/\D/g, '').length >= 9; }
+    };
+    function toets(naam) {
+      var veld = form[naam].closest('.veld');
+      var ok = REGELS[naam](form[naam].value);
+      veld.classList.toggle('goed', ok);
+      if (ok) veld.classList.remove('mis');
+      return ok;
+    }
+    Object.keys(REGELS).forEach(function (naam) {
+      form[naam].addEventListener('input', function () { toets(naam); });
+      if (form[naam].value) toets(naam);
+    });
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var ok = true;
+      Object.keys(REGELS).forEach(function (sleutel) {
+        var goed = toets(sleutel);
+        form[sleutel].closest('.veld').classList.toggle('mis', !goed);
+        if (!goed) ok = false;
+      });
+      if (!ok) return;
+
+      lead.naam = form.naam.value.trim();
+      lead.email = form.email.value.trim();
+      lead.telefoon = form.telefoon.value.trim();
+      lead.website = form.website.value;
+
+      var knop = document.getElementById('qVerzend');
+      knop.disabled = true;
+      knop.innerHTML = '<span class="laden"></span> Een moment';
+      fout.classList.remove('aan');
+
+      verstuur('AANVRAAG').then(function (uit) {
+        if (uit.ok) {
+          leadVerstuurd = true;
+          if (window.CF && typeof CF.lead === 'function') {
+            try { CF.lead({ email: lead.email, phone: lead.telefoon, name: lead.naam }, 150); } catch (e) {}
+          }
+          cfPixel('Lead', { content_name: 'EGYM kennismaking ' + locatie().naam });
+        }
+        ga(stap + 1);
+      });
+    });
+
+    setTimeout(function () { var n = document.getElementById('fNaam'); if (n && !lead.naam) n.focus(); }, 60);
+  }
+
+  function toonUitslag() {
+    var punten = uitslagPunten();
+    var loc = locatie();
+    var vn = voornaam();
+
+    scherm.innerHTML =
+      '<h2>Dit is wat EGYM voor jou zou betekenen' + (vn ? ', ' + esc(vn) : '') + '</h2>' +
+      '<p class="hint">Opgebouwd uit wat je net invulde. De hoofdcoach krijgt hetzelfde te zien.</p>' +
+      '<div class="uitslag__kaart">' +
+      punten.map(function (p) {
+        return '<div class="uitslag__punt"><i></i><span><b>' + esc(p[0]) + '</b>' + esc(p[1]) + '</span></div>';
+      }).join('') +
+      '</div>' +
+      '<p class="hint">Nog nooit zo getraind? Geen zorgen. Bij ons begin je op jouw niveau, samen met je Fit-Coach.</p>' +
+      '<div class="uitslag__kaart" style="margin-top:22px"><div class="uitslag__punt"><i></i><span>' +
+        '<b>Je aanvraag gaat naar ConnectFit ' + esc(loc.naam) + '</b>' + esc(loc.adres) +
+      '</span></div></div>' +
+      '<div class="klaar">' +
+      '<div class="klaar__vink"></div>' +
+      '<h3>En nu? De hoofdcoach belt je.</h3>' +
+      '<p class="hint" style="text-align:center">De hoofdcoach van ConnectFit ' + esc(loc.naam) + ' belt je <b>binnen 24 uur</b>, vaak nog dezelfde dag, om je kennismaking in te plannen. We bellen tussen 8:00 en 12:00 of tussen 17:30 en 20:30.</p>' +
+      '<p class="hint" style="text-align:center">Een uur, en je gaat naar huis met je Bio-Age-uitslag. Dat is het getal waar je over tien weken het nieuwe naast legt.</p>' +
+      '<div class="klaar__bellen">' +
+        '<p>Je ziet dit nummer in je scherm:</p>' +
+        '<a class="klaar__nr" href="tel:' + esc(CFG.telefoon_link) + '">' + esc(CFG.telefoon) + '</a>' +
+        '<p>Zet hem er alvast in, dan weet je wie er belt.</p>' +
+        '<p class="klaar__nu">Liever nu meteen een moment vastzetten?</p>' +
+        '<a class="btn btn--groot" href="tel:' + esc(CFG.telefoon_link) + '">Bel ons even</a>' +
+      '</div>' +
+      '</div>' +
+      '<div class="quiz__actie">' +
+      '<button class="btn btn--groot" id="qSluit2" type="button">Sluiten</button>' +
+      '</div>';
+
+    document.getElementById('qSluit2').addEventListener('click', dicht);
+    wisVoortgang();
+  }
+
+  function stapNaam(i) {
+    if (i < VRAGEN.length) return 'Vraag ' + (i + 1) + ' van ' + VRAGEN.length;
+    if (i === VRAGEN.length) return 'Je gegevens';
+    return 'Je uitslag';
+  }
+
+  function bewaarVoortgang() {
+    if (leadVerstuurd) return;
+    try { sessionStorage.setItem(BEWAARSLEUTEL, JSON.stringify({ antwoorden: antwoorden, lead: lead, stap: stap, tijd: Date.now() })); } catch (e) {}
+  }
+  function herstelVoortgang() {
+    try {
+      var ruw = sessionStorage.getItem(BEWAARSLEUTEL);
+      if (!ruw) return;
+      var d = JSON.parse(ruw);
+      if (!d || !d.antwoorden) return;
+      if (d.tijd && Date.now() - d.tijd > 2 * 60 * 60 * 1000) { wisVoortgang(); return; }
+      antwoorden = d.antwoorden;
+      lead = d.lead || {};
+      stap = Math.min(d.stap || 0, VRAGEN.length);
+    } catch (e) {}
+  }
+  function wisVoortgang() { try { sessionStorage.removeItem(BEWAARSLEUTEL); } catch (e) {} }
+
+  function ga(nieuw) {
+    stap = Math.max(0, Math.min(nieuw, TOTAAL - 1));
+    tel.textContent = stapNaam(stap);
+    terug.disabled = stap === 0 || stap >= VRAGEN.length + 1;
+
+    if (stap < VRAGEN.length) toonVraag(stap);
+    else if (stap === VRAGEN.length) { toonGegevens(); cfMeet('contact_open'); }
+    else { toonUitslag(); cfMeet('quiz_result'); }
+
+    quiz.scrollTop = 0;
+    if (!terugNavigatie && history.pushState) {
+      history.pushState({ quizStap: stap }, '', location.pathname + location.search + '#check-' + (stap + 1));
+    }
+    terugNavigatie = false;
+    bewaarVoortgang();
+  }
+
+  function open() {
+    quiz.classList.add('aan');
+    document.body.style.overflow = 'hidden';
+    if (!Object.keys(antwoorden).length) {
+      start = Date.now();
+      cfPixel('ViewContent', { content_name: 'check gestart' });
+      if (window.CF && typeof CF.start === 'function') { try { CF.start('doel'); } catch (e) {} }
+      else cfMeet('quiz_start');
+    }
+    ga(stap);
+  }
+
+  function dicht() {
+    quiz.classList.remove('aan');
+    document.body.style.overflow = '';
+    if (history.replaceState) history.replaceState({}, '', location.pathname + location.search);
+  }
+
+  window.addEventListener('popstate', function (e) {
+    if (!quiz.classList.contains('aan')) return;
+    var s = e.state && typeof e.state.quizStap === 'number' ? e.state.quizStap : null;
+    if (s === null) { dicht(); return; }
+    terugNavigatie = true;
+    ga(s);
+  });
+
+  window.addEventListener('pagehide', function () {
+    if (quiz.classList.contains('aan') && !leadVerstuurd) cfMeet('quiz_afgebroken', { stap: stap + 1, stapnaam: stapNaam(stap) });
+  });
+
+  quiz.addEventListener('focusin', function (e) {
+    if (e.target && /^(INPUT|TEXTAREA)$/.test(e.target.tagName)) quiz.classList.add('quiz--typen');
+  });
+  quiz.addEventListener('focusout', function () {
+    setTimeout(function () {
+      var a = document.activeElement;
+      if (!a || !/^(INPUT|TEXTAREA)$/.test(a.tagName)) quiz.classList.remove('quiz--typen');
+    }, 60);
+  });
+
+  herstelVoortgang();
+
+  document.querySelectorAll('.js-start').forEach(function (k) {
+    k.addEventListener('click', function () {
+      if (window.CF && typeof CF.cta === 'function') { try { CF.cta(k.textContent.trim(), 'pagina'); } catch (e) {} }
+      open();
+    });
+  });
+  terug.addEventListener('click', function () { ga(stap - 1); });
+  sluit.addEventListener('click', dicht);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && quiz.classList.contains('aan')) dicht();
+  });
+
+  if (/^#check/.test(location.hash)) open();
+})();
+</script>
+
+<script>
+/* ============ Informatie-popup (knop "Stuur mij alle informatie" en uitstap) ============ */
+(function () {
+  'use strict';
+  var CFG = window.CFG || {};
+  var P = CFG.popup || {};
+  if (!P.aan) return;
+
+  var SLEUTEL = 'cf_popup_' + (CFG.slug || 'locatie');
+  var DERTIG_DAGEN = 30 * 24 * 60 * 60 * 1000;
+  var MIN_VERBLIJF = 10000;
+  var start = Date.now();
+  var getoond = false;
+  var dialoog = null;
+  var vorigeFocus = null;
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function alGezien() { try { var t = Number(localStorage.getItem(SLEUTEL) || 0); return t && Date.now() - t < DERTIG_DAGEN; } catch (e) { return false; } }
+  function onthoud() { try { localStorage.setItem(SLEUTEL, String(Date.now())); } catch (e) {} }
+
+  function magTonen() {
+    if (getoond) return false;
+    if (Date.now() - start < MIN_VERBLIJF) return false;
+    var q = document.getElementById('quiz');
+    if (q && q.classList.contains('aan')) return false;
+    if (alGezien()) return false;
+    return true;
+  }
+
+  function toon(aanleiding, forceer) {
+    if (dialoog) return;
+    if (!forceer && !magTonen()) return;
+    getoond = true;
+    onthoud();
+    vorigeFocus = document.activeElement;
+
+    dialoog = document.createElement('div');
+    dialoog.className = 'uitstap';
+    dialoog.setAttribute('role', 'dialog');
+    dialoog.setAttribute('aria-modal', 'true');
+    dialoog.setAttribute('aria-labelledby', 'uitstapKop');
+    dialoog.innerHTML =
+      '<div class="uitstap__doek" data-sluit></div>' +
+      '<div class="uitstap__kaart">' +
+        '<button class="uitstap__x" type="button" data-sluit aria-label="Sluiten">&times;</button>' +
+        '<h2 id="uitstapKop">' + esc(P.kop) + '</h2>' +
+        '<p>' + esc(P.tekst) + '</p>' +
+        '<form class="uitstap__form" novalidate>' +
+          '<div class="veld"><label for="upNaam">Voornaam</label><input id="upNaam" name="naam" type="text" autocomplete="given-name"></div>' +
+          '<div class="veld"><label for="upMail">E-mailadres</label><input id="upMail" name="email" type="email" inputmode="email" autocomplete="email"></div>' +
+          '<div class="veld"><label for="upTel">Telefoonnummer</label><input id="upTel" name="telefoon" type="tel" inputmode="tel" autocomplete="tel"></div>' +
+          '<input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="honing">' +
+          '<p class="uitstap__fout" id="upFout"></p>' +
+          '<button class="btn btn--groot" type="submit">' + esc(P.knop) + '</button>' +
+        '</form>' +
+        '<p class="uitstap__klein">' + esc(P.klein || '') + '</p>' +
+        '<button class="uitstap__anders" type="button">' + esc(P.anders) + '</button>' +
+      '</div>';
+
+    document.body.appendChild(dialoog);
+    document.body.classList.add('uitstap-open');
+    requestAnimationFrame(function () { dialoog.classList.add('aan'); });
+    cfMeet('info_popup', { aanleiding: aanleiding || '' });
+
+    var eerste = dialoog.querySelector('#upNaam');
+    if (eerste) setTimeout(function () { eerste.focus(); }, 60);
+
+    dialoog.querySelectorAll('[data-sluit]').forEach(function (k) { k.addEventListener('click', sluit); });
+    dialoog.querySelector('.uitstap__anders').addEventListener('click', function () {
+      sluit();
+      var knop = document.querySelector('.js-start');
+      if (knop) knop.click();
+    });
+    dialoog.querySelector('form').addEventListener('submit', verstuur);
+    document.addEventListener('keydown', opToets);
+  }
+
+  function sluit() {
+    if (!dialoog) return;
+    dialoog.classList.remove('aan');
+    document.removeEventListener('keydown', opToets);
+    document.body.classList.remove('uitstap-open');
+    var d = dialoog;
+    dialoog = null;
+    setTimeout(function () { if (d.parentNode) d.parentNode.removeChild(d); }, 220);
+    if (vorigeFocus && vorigeFocus.focus) vorigeFocus.focus();
+  }
+
+  function opToets(e) {
+    if (e.key === 'Escape') { sluit(); return; }
+    if (e.key !== 'Tab' || !dialoog) return;
+    var f = dialoog.querySelectorAll('button, input, [href]');
+    if (!f.length) return;
+    var eerste = f[0], laatste = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === eerste) { e.preventDefault(); laatste.focus(); }
+    else if (!e.shiftKey && document.activeElement === laatste) { e.preventDefault(); eerste.focus(); }
+  }
+
+  function melding(el, tekst) { el.textContent = tekst; el.classList.add('aan'); }
+
+  function verstuur(e) {
+    e.preventDefault();
+    var form = e.target;
+    var fout = dialoog.querySelector('#upFout');
+    var naam = form.naam.value.trim();
+    var mail = form.email.value.trim();
+    var telNr = form.telefoon.value.trim();
+
+    if (!naam) { melding(fout, 'Vul je voornaam in.'); form.naam.focus(); return; }
+    if (!/^[^@\s]+@[^@\s.]+\.[^@\s]+$/.test(mail)) { melding(fout, 'Dit e-mailadres klopt niet.'); form.email.focus(); return; }
+    if (telNr.replace(/\D/g, '').length < 9) { melding(fout, 'Vul een telefoonnummer in, dan kunnen we je bellen.'); form.telefoon.focus(); return; }
+
+    var knop = form.querySelector('button[type=submit]');
+    knop.disabled = true;
+    knop.textContent = 'Momentje';
+
+    cfMeet('lead_informatie', { soort: 'INFO' });
+    cfStuur({
+      soort: 'INFO', funnel: 'egym-kennismaking', locatie: CFG.locaties[CFG.slug].naam,
+      naam: naam, email: mail, telefoon: telNr, website: form.website.value,
+      pagina: location.href, utm: cfUtms()
+    }).then(function (uit) {
+      if (uit.ok) {
+        if (window.CF && typeof CF.lead === 'function') { try { CF.lead({ email: mail, phone: telNr, name: naam }, 50); } catch (e) {} }
+        cfPixel('Lead', { content_name: 'EGYM informatie ' + CFG.locaties[CFG.slug].naam });
+      }
+      var kaart = dialoog.querySelector('.uitstap__kaart');
+      kaart.innerHTML =
+        '<button class="uitstap__x" type="button" data-sluit aria-label="Sluiten">&times;</button>' +
+        '<h2>' + esc(P.bedankt_kop) + '</h2><p>' + esc(P.bedankt_tekst) + '</p>' +
+        '<button class="btn btn--groot" type="button" data-sluit style="width:100%">Sluiten</button>';
+      kaart.querySelectorAll('[data-sluit]').forEach(function (k) { k.addEventListener('click', sluit); });
+    });
+  }
+
+  document.querySelectorAll('.js-info').forEach(function (k) {
+    k.addEventListener('click', function () { toon('knop', true); });
+  });
+
+  /* Uitstap op desktop: muis naar de adresbalk */
+  document.addEventListener('mouseout', function (e) {
+    if (!e.relatedTarget && e.clientY <= 0) toon('uitstap');
+  });
+  /* Uitstap op mobiel: snel terug omhoog scrollen na een flink stuk lezen */
+  var laatste = window.pageYOffset || 0;
+  window.addEventListener('scroll', function () {
+    var nu = window.pageYOffset || 0;
+    if (laatste - nu > 120 && nu > 1200) toon('terugscroll');
+    laatste = nu;
+  }, { passive: true });
+})();
+</script>
+
+<script>
+/* ============ Carrousels, sticky knop en vergelijkingstabel (1-op-1 van het origineel) ============ */
+function schuifNaar(rij, doel) {
+  doel = Math.max(0, Math.min(doel, rij.scrollWidth - rij.clientWidth));
+  var start = rij.scrollLeft;
+  var verschil = doel - start;
+  if (Math.abs(verschil) < 2) return;
+  var snel = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (snel || !window.requestAnimationFrame) { rij.scrollLeft = doel; return; }
+  var oudeSnap = rij.style.scrollSnapType;
+  rij.style.scrollSnapType = 'none';
+  var hersteld = false;
+  function herstel(naar) {
+    if (hersteld) return;
+    hersteld = true;
+    if (naar !== undefined) rij.scrollLeft = naar;
+    rij.style.scrollSnapType = oudeSnap;
+  }
+  var noodrem = setTimeout(function () { herstel(doel); }, 600);
+  var begin = null, duur = 320;
+  function stap(nu) {
+    if (hersteld) return;
+    if (begin === null) begin = nu;
+    var d = Math.min(1, (nu - begin) / duur);
+    var e = d < 0.5 ? 2 * d * d : -1 + (4 - 2 * d) * d;
+    rij.scrollLeft = start + verschil * e;
+    if (d < 1) { requestAnimationFrame(stap); return; }
+    clearTimeout(noodrem);
+    herstel();
+  }
+  requestAnimationFrame(stap);
+}
+function kaartMidden(rij, kaart) { return kaart.offsetLeft - rij.offsetLeft - (rij.clientWidth - kaart.offsetWidth) / 2; }
+function carrousel(rijSelector, bollenId, kaartSelector) {
+  var rij = document.querySelector(rijSelector);
+  var bollen = document.getElementById(bollenId);
+  if (!rij || !bollen) return;
+  var kaarten = Array.prototype.slice.call(rij.querySelectorAll(kaartSelector));
+  if (kaarten.length < 2) return;
+  kaarten.forEach(function (kaart, i) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('aria-label', 'Onderdeel ' + (i + 1) + ' van ' + kaarten.length);
+    b.setAttribute('aria-current', i === 0 ? 'true' : 'false');
+    b.addEventListener('click', function () { schuifNaar(rij, kaartMidden(rij, kaart)); });
+    bollen.appendChild(b);
+  });
+  var knoppen = Array.prototype.slice.call(bollen.children);
+  var bezig;
+  function actiefBijwerken() {
+    var midden = rij.scrollLeft + rij.clientWidth / 2;
+    var dichtst = 0, kleinste = Infinity;
+    kaarten.forEach(function (k, i) {
+      var afstand = Math.abs((k.offsetLeft - rij.offsetLeft + k.offsetWidth / 2) - midden);
+      if (afstand < kleinste) { kleinste = afstand; dichtst = i; }
+    });
+    knoppen.forEach(function (b, i) { b.setAttribute('aria-current', i === dichtst ? 'true' : 'false'); });
+  }
+  rij.addEventListener('scroll', function () { clearTimeout(bezig); bezig = setTimeout(actiefBijwerken, 70); }, { passive: true });
+  actiefBijwerken();
+}
+carrousel('.rijen', 'redenBollen', '.rij');
+carrousel('.stappen', 'stapBollen', '.stap');
+carrousel('.quotes', 'quotesBollen', '.quote-kaart');
+
+(function () {
+  var balk = document.querySelector('.sticky');
+  if (!balk || !('IntersectionObserver' in window)) return;
+  var knoppen = Array.prototype.slice.call(document.querySelectorAll('.js-start')).filter(function (k) { return !balk.contains(k); });
+  if (!knoppen.length) return;
+  var zichtbaar = [];
+  function zet(el, aan) {
+    var i = zichtbaar.indexOf(el);
+    if (aan && i === -1) zichtbaar.push(el);
+    if (!aan && i > -1) zichtbaar.splice(i, 1);
+  }
+  var wachten;
+  function bijwerken() {
+    clearTimeout(wachten);
+    wachten = setTimeout(function () { balk.setAttribute('data-weg', zichtbaar.length ? 'ja' : 'nee'); }, 120);
+  }
+  var kijker = new IntersectionObserver(function (items) {
+    items.forEach(function (i) { zet(i.target, i.isIntersecting); });
+    bijwerken();
+  }, { rootMargin: '-10px 0px -90px 0px' });
+  knoppen.forEach(function (k) { kijker.observe(k); });
+})();
+
+(function () {
+  var rol = document.querySelector('.verg__rol');
+  var rij = rol && rol.querySelector('.verg');
+  var bollen = document.getElementById('vergBollen');
+  if (!rij || !bollen) return;
+  function randBijwerken() { rol.classList.toggle('aan-het-eind', rij.scrollLeft + rij.clientWidth >= rij.scrollWidth - 12); }
+  rij.addEventListener('scroll', randBijwerken, { passive: true });
+  randBijwerken();
+  var kolommen = Array.prototype.slice.call(rij.querySelectorAll('.verg__kop')).filter(function (k) { return !k.classList.contains('verg__wat'); });
+  if (kolommen.length < 2) return;
+  kolommen.forEach(function (kol, i) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('aria-label', kol.textContent.trim() || 'Kolom ' + (i + 1));
+    b.setAttribute('aria-current', i === 0 ? 'true' : 'false');
+    b.addEventListener('click', function () { schuifNaar(rij, kol.offsetLeft - rij.offsetLeft - 132); });
+    bollen.appendChild(b);
+  });
+  var knoppen = Array.prototype.slice.call(bollen.children);
+  function actiefBijwerken() {
+    var links = rij.scrollLeft + 132;
+    var dichtst = 0, kleinste = Infinity;
+    kolommen.forEach(function (k, i) {
+      var afstand = Math.abs((k.offsetLeft - rij.offsetLeft) - links);
+      if (afstand < kleinste) { kleinste = afstand; dichtst = i; }
+    });
+    knoppen.forEach(function (b, i) { b.setAttribute('aria-current', i === dichtst ? 'true' : 'false'); });
+  }
+  var bezig;
+  rij.addEventListener('scroll', function () { clearTimeout(bezig); bezig = setTimeout(actiefBijwerken, 70); }, { passive: true });
+  actiefBijwerken();
+})();
+</script>
+</body>
+</html>
